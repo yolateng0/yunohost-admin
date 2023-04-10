@@ -21,7 +21,9 @@
 
       <p>
         <strong v-t="'api_error.error_message'" />
-        <b-alert class="mt-2" variant="danger" v-html="error.message" />
+        <b-alert class="mt-2" variant="danger">
+          <div v-html="error.message" />
+        </b-alert>
       </p>
 
       <template v-if="error.traceback">
@@ -50,7 +52,7 @@
 </template>
 
 <script>
-import MessageListGroup from '@/components/MessageListGroup'
+import MessageListGroup from '@/components/MessageListGroup.vue'
 
 export default {
   name: 'ErrorDisplay',

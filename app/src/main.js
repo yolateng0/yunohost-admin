@@ -17,12 +17,7 @@ Vue.config.productionTip = false
 Vue.use(BootstrapVue, {
   BSkeleton: { animation: 'none' },
   BAlert: { show: true },
-  BBadge: { pill: true },
-  BModal: {
-    bodyBgVariant: 'warning',
-    centered: true,
-    bodyClass: ['font-weight-bold', 'rounded-top']
-  }
+  BBadge: { pill: true }
 })
 
 Vue.use(VueShowdown, {
@@ -37,31 +32,47 @@ Vue.prototype.$askConfirmation = function (message, props) {
   return this.$bvModal.msgBoxConfirm(message, {
     okTitle: this.$i18n.t('ok'),
     cancelTitle: this.$i18n.t('cancel'),
+    bodyBgVariant: 'warning',
+    centered: true,
+    bodyClass: ['font-weight-bold', 'rounded-top', store.state.theme ? 'text-white' : 'text-black'],
     ...props
   })
 }
 
+Vue.prototype.$askMdConfirmation = function (markdown, props, ok = false) {
+  const content = this.$createElement('vue-showdown', {
+    props: { markdown, flavor: 'github', options: { headerLevelStart: 4 } }
+  })
+  return this.$bvModal['msgBox' + (ok ? 'Ok' : 'Confirm')](content, {
+    okTitle: this.$i18n.t('yes'),
+    cancelTitle: this.$i18n.t('cancel'),
+    headerBgVariant: 'warning',
+    headerClass: store.state.theme ? 'text-white' : 'text-black',
+    centered: true,
+    ...props
+  })
+}
 
 // Register global components
-const requireComponent = require.context('@/components/globals', true, /\.(js|vue)$/i)
-// For each matching file name...
-requireComponent.keys().forEach((fileName) => {
-  // Get the component
-  const component = requireComponent(fileName).default
-  // Globally register the component
+const globalComponentsModules = import.meta.glob([
+  '@/components/globals/*.vue',
+  '@/components/globals/*/*.vue'
+], { eager: true })
+Object.values(globalComponentsModules).forEach((module) => {
+  const component = module.default
   Vue.component(component.name, component)
 })
 
 registerGlobalErrorHandlers()
 
 // Load default locales translations files and setup store data
-initDefaultLocales()
+initDefaultLocales().then(() => {
+  const app = new Vue({
+    store,
+    router,
+    i18n,
+    render: h => h(App)
+  })
 
-const app = new Vue({
-  store,
-  router,
-  i18n,
-  render: h => h(App)
+  app.$mount('#app')
 })
-
-app.$mount('#app')

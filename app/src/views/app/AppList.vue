@@ -16,14 +16,14 @@
 
     <b-list-group>
       <b-list-group-item
-        v-for="{ id, name, description, label } in filteredApps" :key="id"
+        v-for="{ id, description, label } in filteredApps" :key="id"
         :to="{ name: 'app-info', params: { id }}"
         class="d-flex justify-content-between align-items-center pr-0"
       >
         <div>
           <h5 class="font-weight-bold">
             {{ label }}
-            <small v-if="name" class="text-secondary">{{ name }}</small>
+            <small class="text-secondary">{{ id }}</small>
           </h5>
           <p class="m-0">
             {{ description }}
@@ -68,25 +68,8 @@ export default {
         return
       }
 
-      const multiInstances = {}
-      this.apps = apps.map(({ id, name, description, permissions, manifest }) => {
-        // FIXME seems like some apps may no have a label (replace with id)
-        const label = permissions[id + '.main'].label
-        // Display the `id` of the instead of its `name` if multiple apps share the same name
-        if (manifest.multi_instance) {
-          if (!(name in multiInstances)) {
-            multiInstances[name] = []
-          }
-          const labels = multiInstances[name]
-          if (labels.includes(label)) {
-            name = id
-          }
-          labels.push(label)
-        }
-        if (label === name) {
-          name = null
-        }
-        return { id, name, description, label }
+      this.apps = apps.map(({ id, name, description, manifest }) => {
+        return { id, name: manifest.name, label: name, description }
       }).sort((prev, app) => {
         return prev.label > app.label ? 1 : -1
       })

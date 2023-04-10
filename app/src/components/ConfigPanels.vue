@@ -1,9 +1,28 @@
 <template>
-  <routable-tabs
-    :routes="routes_"
-    v-bind="{ panels, forms, v: $v }"
-    v-on="$listeners"
-  />
+  <div class="config-panel">
+    <routable-tabs
+      v-if="routes_.length > 1"
+      :routes="routes_"
+      v-bind="{ panels, forms, v: $v, ...$attrs }"
+      v-on="$listeners"
+    >
+      <template #tab-top>
+        <slot name="tab-top" />
+      </template>
+      <template #tab-before>
+        <slot name="tab-before" />
+      </template>
+      <template #tab-after>
+        <slot name="tab-after" />
+      </template>
+    </routable-tabs>
+
+    <card v-else :title="routes_[0].text" :icon="routes_[0].icon">
+      <slot name="tab-top" />
+      <slot name="tab-before" />
+      <slot name="tab-after" />
+    </card>
+  </div>
 </template>
 
 <script>
@@ -49,10 +68,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.card-title {
-  margin-bottom: 1em;
-  border-bottom: solid 1px #aaa;
-}
-</style>

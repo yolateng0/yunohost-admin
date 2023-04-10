@@ -43,7 +43,7 @@
               <em>{{ $t('group_explain_visitors_needed_for_external_client') }}</em>
             </p>
           </template>
-          <template v-else>
+          <template v-if="groupName == 'admins' || !group.isSpecial">
             <tags-selectize-item
               v-model="group.members" :options="usersOptions"
               :id="groupName + '-users'" :label="$t('group_add_member')"
@@ -109,7 +109,7 @@ import Vue from 'vue'
 
 import api from '@/api'
 import { isEmptyValue } from '@/helpers/commons'
-import TagsSelectizeItem from '@/components/globals/formItems/TagsSelectizeItem'
+import TagsSelectizeItem from '@/components/globals/formItems/TagsSelectizeItem.vue'
 
 // TODO add global search with type (search by: group, user, permission)
 // TODO add vuex store update on inputs ?
@@ -173,7 +173,7 @@ export default {
           continue
         }
 
-        group.isSpecial = ['visitors', 'all_users'].includes(groupName)
+        group.isSpecial = ['visitors', 'all_users', 'admins'].includes(groupName)
 
         if (groupName === 'visitors') {
           // Forbid to add or remove a protected permission on group `visitors`
@@ -184,6 +184,13 @@ export default {
 
         if (groupName === 'all_users') {
           // Forbid to add ssh and sftp permission on group `all_users`
+          group.disabledItems = permissions.filter(({ id }) => {
+            return ['ssh.main', 'sftp.main'].includes(id)
+          }).map(({ id }) => permsDict[id].label)
+        }
+
+        if (groupName === 'admins') {
+          // Forbid to add ssh and sftp permission on group `admins`
           group.disabledItems = permissions.filter(({ id }) => {
             return ['ssh.main', 'sftp.main'].includes(id)
           }).map(({ id }) => permsDict[id].label)

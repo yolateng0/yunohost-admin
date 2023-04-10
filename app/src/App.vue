@@ -7,7 +7,12 @@
           :to="{ name: 'home' }" :disabled="waiting"
           exact exact-active-class="active"
         >
-          <img alt="Yunohost logo" src="./assets/logo.png">
+          <span v-if="theme">
+            <img alt="YunoHost logo" src="./assets/logo_light.png" width="40">
+          </span>
+          <span v-else>
+            <img alt="YunoHost logo" src="./assets/logo_dark.png" width="40">
+          </span>
         </b-navbar-brand>
 
         <b-navbar-nav class="ml-auto">
@@ -65,8 +70,9 @@
 
           <b-nav-text
             v-if="yunohost" id="yunohost-version" class="ml-md-auto text-center"
-            v-html="$t('footer_version', yunohost)"
-          />
+          >
+            <span v-html="$t('footer_version', yunohost)" />
+          </b-nav-text>
         </b-nav>
       </nav>
     </footer>
@@ -93,7 +99,8 @@ export default {
       'routerKey',
       'transitions',
       'transitionName',
-      'waiting'
+      'waiting',
+      'theme'
     ])
   },
 
@@ -153,6 +160,8 @@ export default {
     if (today.getDate() === 31 && today.getMonth() + 1 === 10) {
       this.$store.commit('SET_SPINNER', 'spookycat')
     }
+
+    document.documentElement.setAttribute('dark-theme', this.theme) // updates the data-theme attribute
   }
 }
 </script>

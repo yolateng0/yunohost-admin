@@ -4,7 +4,9 @@
     :validation="$v" :server-error="serverError"
     @submit.prevent="onSubmit"
   >
-    <slot name="disclaimer" slot="disclaimer" />
+    <template #disclaimer>
+      <slot name="disclaimer" />
+    </template>
 
     <b-form-radio
       v-model="selected" name="domain-type" value="domain"
@@ -51,7 +53,7 @@
 import { mapGetters } from 'vuex'
 import { validationMixin } from 'vuelidate'
 
-import AdressInputSelect from '@/components/AdressInputSelect'
+import AdressInputSelect from '@/components/AdressInputSelect.vue'
 import { formatFormDataValue } from '@/helpers/yunohostArguments'
 import { required, domain, dynDomain } from '@/helpers/validators'
 
@@ -126,12 +128,10 @@ export default {
   },
 
   methods: {
-    onSubmit () {
+    async onSubmit () {
       const domainType = this.selected
-      this.$emit('submit', {
-        domain: formatFormDataValue(this.form[domainType]),
-        domainType
-      })
+      const domain = await formatFormDataValue(this.form[domainType])
+      this.$emit('submit', { domain, domainType })
     }
   },
 

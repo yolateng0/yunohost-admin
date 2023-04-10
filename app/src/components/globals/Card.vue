@@ -6,6 +6,7 @@
           <component :is="titleTag" class="custom-header-title">
             <icon v-if="icon" :iname="icon" class="mr-2" />{{ title }}
           </component>
+          <slot name="header-next" />
         </slot>
 
         <div v-if="hasButtons" class="mt-2 w-100 custom-header-buttons" :class="{ [`ml-${buttonUnbreak}-auto mt-${buttonUnbreak}-0 w-${buttonUnbreak}-auto`]: buttonUnbreak }">
@@ -29,11 +30,13 @@
         <slot name="default" />
       </b-card-body>
     </b-collapse>
-    <slot v-else name="default" slot="default" />
+    <template v-else>
+      <slot name="default" />
+    </template>
 
-    <slot name="footer" slot="footer">
+    <template #footer v-if="'buttons' in $slots">
       <slot name="buttons" />
-    </slot>
+    </template>
   </b-card>
 </template>
 

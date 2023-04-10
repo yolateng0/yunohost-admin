@@ -70,8 +70,8 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import QueryHeader from '@/components/QueryHeader'
-import MessageListGroup from '@/components/MessageListGroup'
+import QueryHeader from '@/components/QueryHeader.vue'
+import MessageListGroup from '@/components/MessageListGroup.vue'
 
 export default {
   name: 'HistoryConsole',
@@ -206,6 +206,7 @@ export default {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
   font-size: $font-size-sm;
+
 
   & > header {
     cursor: ns-resize;
