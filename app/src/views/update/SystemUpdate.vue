@@ -1,87 +1,326 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { secondsToHours } from 'date-fns/secondsToHours'
+
+import api from '@/api'
+import { useAutoModal } from '@/composables/useAutoModal'
+import { useSSE } from '@/composables/useSSE'
+import type { SystemUpdate, AppUpgradeResult } from '@/types/core/api'
+import { formatAppNotifs } from '../app/appData'
+
+const { t } = useI18n()
+const { tryToReconnect } = useSSE()
+const modalConfirm = useAutoModal()
+
+const {
+  apps,
+  system,
+  importantYunohostUpgrade,
+  pendingMigrations,
+  lastAptUpdate,
+  lastAppsCatalogUpdate,
+} = await api
+  .get<SystemUpdate>({ uri: 'update' })
+  .then(
+    ({
+      apps,
+      system,
+      important_yunohost_upgrade,
+      pending_migrations,
+      last_apt_update,
+      last_apps_catalog_update,
+    }) => {
+      return {
+        apps: ref(apps.filter((app) => app.upgrade.status != 'up_to_date')),
+        system: ref(system),
+        importantYunohostUpgrade: important_yunohost_upgrade,
+        pendingMigrations: !!pending_migrations.length,
+        lastAptUpdate: secondsToHours(last_apt_update),
+        lastAppsCatalogUpdate: secondsToHours(last_apps_catalog_update),
+      }
+    },
+  )
+const preUpgrade = ref<
+  | {
+      apps: {
+        id: string
+        name: string
+        currentVersion: string
+        newVersion: string
+        notif: string
+      }[]
+      hasNotifs: boolean
+    }
+  | undefined
+>()
+
+async function confirmAppsUpgrade(id?: string) {
+  const appList = id
+    ? [apps.value.find((app) => app.id === id)!]
+    : apps.value.filter((app) => app.upgrade.status == 'upgradable')
+  const apps_ = appList.map((app) => ({
+    id: app.id,
+    name: app.name,
+    currentVersion: app.upgrade.current_version,
+    newVersion: app.upgrade.new_version || '',
+    notif: formatAppNotifs(app.upgrade.notifications),
+  }))
+  preUpgrade.value = { apps: apps_, hasNotifs: apps_.some((app) => app.notif) }
+}
+
+async function performAppsUpgrade(ids: string[]) {
+  const apps_ = ids.map((id) => apps.value.find((app) => app.id === id)!)
+  const lastAppId = apps_[apps_.length - 1].id
+
+  for (const app of apps_) {
+    const continue_ = await api
+      .put<AppUpgradeResult>({
+        uri: `apps/${app.id}/upgrade`,
+      })
+      .then((response) => {
+        const postMessage = formatAppNotifs(response.notifications.POST_UPGRADE)
+        const isLast = app.id === lastAppId
+        apps.value = apps.value.filter((a) => app.id !== a.id)
+
+        if (postMessage) {
+          const message =
+            '<small><em>' +
+            t('app.upgrade.notifs.post.alert') +
+            '</em></small>\n\n' +
+            postMessage
+          return modalConfirm(
+            message,
+            {
+              title: t('app.upgrade.notifs.post.title', {
+                name: app.name,
+              }),
+              /* i18n: app.upgrade.continue */
+              okTitle: t(isLast ? 'ok' : 'app.upgrade.continue'),
+              cancelTitle: t('app.upgrade.stop'),
+            },
+            { markdown: true, cancelable: !isLast },
+          )
+        } else {
+          return true
+        }
+      })
+    if (!continue_) break
+  }
+}
+
+async function refreshUpdateCache() {
+  api.put<SystemUpdate>({ uri: 'update/all' }).then(() => api.refetch())
+}
+
+async function performSystemUpgrade() {
+  const confirmed = await modalConfirm(t('confirm_update_system'))
+  if (!confirmed) return
+
+  api.put({ uri: 'upgrade/system' }).then(() => {
+    if ('yunohost' in system) {
+      tryToReconnect({
+        origin: 'upgrade_system',
+        initialDelay: 2000,
+      })
+    }
+    api.refetch()
+  })
+}
+</script>
+
 <template>
-  <view-base
-    :queries="queries" queries-wait @queries-response="onQueriesResponse"
-    skeleton="card-list-skeleton"
-  >
+  <div>
     <!-- MIGRATIONS WARN -->
-    <yuno-alert v-if="pendingMigrations" variant="warning" alert>
+    <YAlert v-if="pendingMigrations" variant="warning" alert>
       <span v-html="$t('pending_migrations')" />
-    </yuno-alert>
+    </YAlert>
 
     <!-- MAJOR YUNOHOST UPGRADE WARN -->
-    <yuno-alert v-if="importantYunohostUpgrade" variant="warning" alert>
+    <YAlert v-if="importantYunohostUpgrade" variant="warning" alert>
       <span v-html="$t('important_yunohost_upgrade')" />
-    </yuno-alert>
+    </YAlert>
+
+    <!-- BUTTON TO REFRESH APT CACHE / CATALOG -->
+    <YAlert variant="info" class="mb-5">
+      <ButtonWithDetails
+        :label="t('update.refresh_cache')"
+        icon="refresh"
+        :details="
+          t(
+            lastAptUpdate > 12 || lastAppsCatalogUpdate > 12
+              ? 'update.very_stale_cache'
+              : lastAptUpdate > 1 || lastAppsCatalogUpdate > 1
+                ? 'update.stale_cache'
+                : 'update.ok_cache',
+            { lastAptUpdate, lastAppsCatalogUpdate },
+          )
+        "
+        variant="info"
+        :onclick="refreshUpdateCache"
+      />
+    </YAlert>
 
     <!-- SYSTEM UPGRADE -->
-    <card :title="$t('system')" icon="server" no-body>
-      <b-list-group v-if="system" flush>
-        <b-list-group-item v-for="{ name, current_version, new_version } in system" :key="name">
-          <h5 class="m-0">
-            {{ name }}
-            <small class="text-secondary">({{ $t('from_to', [current_version, new_version]) }})</small>
-          </h5>
-        </b-list-group-item>
-      </b-list-group>
+    <YCard
+      v-if="lastAptUpdate < 12 && lastAppsCatalogUpdate < 12"
+      :title="$t('system')"
+      icon="server"
+      no-body
+    >
+      <BAccordion v-if="Object.keys(system).length" flush free>
+        <BAccordionItem
+          v-for="(packages, category) in system"
+          :key="category"
+          header-tag="h3"
+          button-class="px-3 py-2"
+        >
+          <template #title>
+            <span class="fw-bold">{{ category }}</span>
+            <small class="ms-1"
+              >({{ packages.length }}
+              {{ $t('items.packages', packages.length) }})</small
+            >
+          </template>
+          <ul class="mb-0">
+            <li
+              v-for="{ name, current_version, new_version } in packages"
+              :key="name"
+            >
+              {{ name }}
+              <small class="text-secondary">
+                {{ $t('from_to', [current_version, new_version]) }}
+              </small>
+            </li>
+          </ul>
+        </BAccordionItem>
+      </BAccordion>
 
-      <b-card-body v-else-if="system === null">
-        <span class="text-success"><icon iname="check-circle" /> {{ $t('system_packages_nothing') }}</span>
-      </b-card-body>
+      <BCardBody v-else>
+        <span class="text-success">
+          <YIcon iname="check-circle" />
+          {{ $t('system_packages_nothing') }}
+        </span>
+      </BCardBody>
 
-      <template #buttons v-if="system">
-        <b-button
-          variant="success" v-t="'system_upgrade_all_packages_btn'"
+      <template v-if="Object.keys(system).length" #buttons>
+        <BButton
+          v-t="'system_upgrade_all_packages_btn'"
+          variant="success"
           @click="performSystemUpgrade()"
         />
       </template>
-    </card>
+    </YCard>
 
     <!-- APPS UPGRADE -->
-    <card :title="$t('applications')" icon="cubes" no-body>
-      <b-list-group v-if="apps" flush>
-        <b-list-group-item
-          v-for="{ name, id, current_version, new_version } in apps" :key="id"
-          class="d-flex justify-content-between align-items-center"
+    <YCard
+      v-if="lastAptUpdate < 12 && lastAppsCatalogUpdate < 12"
+      :title="$t('applications')"
+      icon="cubes"
+      no-body
+    >
+      <BListGroup v-if="apps.length" flush free>
+        <BListGroupItem
+          v-for="{ name, id, upgrade } in apps"
+          :key="id"
+          class="d-flex justify-content-between align-items-center ps-3 pe-1"
         >
-          <h5 class="m-0">
-            {{ name }}
-            <small>({{ id }}) {{ $t('from_to', [current_version, new_version]) }}</small>
-          </h5>
+          <BRow align-v="center" class="w-100">
+            <BCol class="text-center text-md-start">
+              <h5 class="mb-1">
+                <span class="fw-bold">{{ name }}</span>
+                <small>
+                  ({{ id }})
+                  <span
+                    v-if="upgrade.new_version"
+                    class="text-secondary d-block d-sm-inline"
+                  >
+                    {{
+                      $t('from_to', [
+                        upgrade.current_version,
+                        upgrade.new_version,
+                      ])
+                    }}
+                  </span>
+                </small>
+              </h5>
 
-          <b-button
-            variant="success" size="sm" v-t="'system_upgrade_btn'"
-            @click="confirmAppsUpgrade(id)"
-          />
-        </b-list-group-item>
-      </b-list-group>
+              <div
+                v-if="upgrade.specific_channel"
+                class="text-start text-warning alert alert-warning py-1 my-1"
+              >
+                <VueShowdown :markdown="upgrade.specific_channel_message" />
+              </div>
 
-      <b-card-body v-else-if="apps === null">
-        <span class="text-success"><icon iname="check-circle" /> {{ $t('system_apps_nothing') }}</span>
-      </b-card-body>
+              <div
+                v-if="upgrade.status != 'upgradable'"
+                class="text-start mt-1 mb-0"
+              >
+                <VueShowdown :markdown="upgrade.message" />
+              </div>
+            </BCol>
 
-      <template #buttons v-if="apps">
-        <b-button
-          variant="success" v-t="'system_upgrade_all_applications_btn'"
+            <BCol class="text-center text-md-end pe-0" cols="12" md="2">
+              <BButton
+                v-if="upgrade.status != 'url_required'"
+                v-t="'system_upgrade_btn'"
+                :variant="
+                  upgrade.status != 'upgradable'
+                    ? 'outline-secondary'
+                    : upgrade.specific_channel
+                      ? 'warning'
+                      : 'success'
+                "
+                :class="upgrade.status != 'upgradable' ? 'disabled' : ''"
+                size="sm"
+                @click="confirmAppsUpgrade(id)"
+              />
+            </BCol>
+          </BRow>
+        </BListGroupItem>
+      </BListGroup>
+
+      <BCardBody v-else>
+        <span class="text-success">
+          <YIcon iname="check-circle" /> {{ $t('system_apps_nothing') }}
+        </span>
+      </BCardBody>
+
+      <template v-if="apps.length" #buttons>
+        <BButton
+          v-t="'system_upgrade_all_applications_btn'"
+          variant="success"
           @click="confirmAppsUpgrade()"
         />
       </template>
-    </card>
+    </YCard>
 
-    <b-modal
+    <BModal
+      v-if="preUpgrade"
       id="apps-pre-upgrade"
+      centered
+      :model-value="true"
       :title="$t('app.upgrade.confirm.title')"
-      header-bg-variant="warning"
-      :header-class="theme ? 'text-white' : 'text-black'"
-      :ok-title="$t('system_upgrade_btn')" ok-variant="success"
+      header-variant="warning"
+      :ok-title="$t('system_upgrade_btn')"
+      ok-variant="success"
       :cancel-title="$t('cancel')"
       @ok="performAppsUpgrade(preUpgrade.apps.map((app) => app.id))"
+      @hide="preUpgrade = undefined"
     >
       <h3>
         {{ $t('app.upgrade.confirm.apps') }}
       </h3>
       <ul>
-        <li v-for="{ name, id } in preUpgrade.apps" :key="id">
-          {{ name }} ({{ id }})
+        <li
+          v-for="{ name, id, currentVersion, newVersion } in preUpgrade.apps"
+          :key="id"
+        >
+          <span class="fw-bold pe-1">{{ name }}</span>
+          <small class="text-muted">
+            ({{ id }})
+            {{ $t('from_to', [currentVersion, newVersion]) }}
+          </small>
         </li>
       </ul>
 
@@ -90,149 +329,35 @@
           {{ $t('app.upgrade.notifs.pre.title') }}
         </h3>
 
-        <yuno-alert variant="warning">
-          {{ $t('app.upgrade.notifs.pre.alert' ) }}
-        </yuno-alert>
+        <YAlert variant="warning">
+          {{ $t('app.upgrade.notifs.pre.alert') }}
+        </YAlert>
 
-        <div class="card-collapse-wrapper">
-          <card-collapse
-            v-for="{ id, name, notif } in preUpgrade.apps" :key="`${id}-notifs`"
-            :title="name" :id="`${id}-notifs`"
-            visible flush
+        <BAccordion visible free>
+          <BAccordionItem
+            v-for="{
+              id,
+              name,
+              currentVersion,
+              newVersion,
+              notif,
+            } in preUpgrade.apps"
+            :key="`${id}-notifs`"
+            header-tag="h3"
+            button-class="px-3 py-2"
+            visible
           >
-            <b-card-body>
-              <vue-showdown :markdown="notif" flavor="github" :options="{ headerLevelStart: 6 }" />
-            </b-card-body>
-          </card-collapse>
-        </div>
+            <template #title>
+              <span class="fw-bold pe-1">{{ name }}</span>
+              <small class="text-muted">
+                ({{ id }})
+                {{ $t('from_to', [currentVersion, newVersion]) }}
+              </small>
+            </template>
+            <VueShowdown :markdown="notif" :options="{ headerLevelStart: 6 }" />
+          </BAccordionItem>
+        </BAccordion>
       </div>
-    </b-modal>
-  </view-base>
+    </BModal>
+  </div>
 </template>
-
-<script>
-import api from '@/api'
-import { mapGetters } from 'vuex'
-
-import CardCollapse from '@/components/CardCollapse.vue'
-
-export default {
-  name: 'SystemUpdate',
-
-  components: {
-    CardCollapse
-  },
-
-  data () {
-    return {
-      queries: [
-        ['PUT', 'update/all', {}, 'update']
-      ],
-      // API data
-      system: undefined,
-      apps: undefined,
-      importantYunohostUpgrade: undefined,
-      pendingMigrations: undefined,
-      preUpgrade: {
-        apps: [],
-        notifs: []
-      }
-    }
-  },
-
-  computed: {
-    ...mapGetters(['theme'])
-  },
-
-  methods: {
-    // eslint-disable-next-line camelcase
-    onQueriesResponse ({ apps, system, important_yunohost_upgrade, pending_migrations }) {
-      this.apps = apps.length ? apps : null
-      this.system = system.length ? system : null
-      // eslint-disable-next-line camelcase
-      this.importantYunohostUpgrade = important_yunohost_upgrade
-      this.pendingMigrations = pending_migrations.length !== 0
-    },
-
-    formatAppNotifs (notifs) {
-      return Object.keys(notifs).reduce((acc, key) => {
-        return acc + '\n\n' + notifs[key]
-      }, '')
-    },
-
-    async confirmAppsUpgrade (id = null) {
-      const appList = id ? [this.apps.find((app) => app.id === id)] : this.apps
-      const apps = appList.map((app) => ({
-        id: app.id,
-        name: app.name,
-        notif: app.notifications.PRE_UPGRADE
-          ? this.formatAppNotifs(app.notifications.PRE_UPGRADE)
-          : ''
-      }))
-      this.preUpgrade = { apps, hasNotifs: apps.some((app) => app.notif) }
-      this.$bvModal.show('apps-pre-upgrade')
-    },
-
-    async performAppsUpgrade (ids) {
-      const apps = ids.map((id) => this.apps.find((app) => app.id === id))
-      const lastAppId = apps[apps.length - 1].id
-
-      for (const app of apps) {
-        const continue_ = await api.put(
-          `apps/${app.id}/upgrade`, {}, { key: 'upgrade.app', app: app.name }
-        ).then((response) => {
-          const postMessage = this.formatAppNotifs(response.notifications.POST_UPGRADE)
-          const isLast = app.id === lastAppId
-          this.apps = this.apps.filter((a) => app.id !== a.id)
-
-          if (postMessage) {
-            const message = this.$i18n.t('app.upgrade.notifs.post.alert') + '\n\n' + postMessage
-            return this.$askMdConfirmation(message, {
-              title: this.$i18n.t('app.upgrade.notifs.post.title', { name: app.name }),
-              okTitle: this.$i18n.t(isLast ? 'ok' : 'app.upgrade.continue'),
-              cancelTitle: this.$i18n.t('app.upgrade.stop')
-            }, isLast)
-          } else {
-            return Promise.resolve(true)
-          }
-        })
-        if (!continue_) break
-      }
-
-      if (!this.apps.length) {
-        this.apps = null
-      }
-    },
-
-    async performSystemUpgrade () {
-      const confirmed = await this.$askConfirmation(this.$i18n.t('confirm_update_system'))
-      if (!confirmed) return
-
-      api.put('upgrade/system', {}, { key: 'upgrade.system' }).then(() => {
-        if (this.system.some(({ name }) => name.includes('yunohost'))) {
-          this.$store.dispatch('TRY_TO_RECONNECT', { attemps: 1, origin: 'upgrade_system', initialDelay: 2000 })
-        }
-        this.system = null
-      })
-    }
-  }
-}
-</script>
-
-<style scoped lang="scss">
-.card-collapse-wrapper {
-  border: $card-border-width solid $card-border-color;
-  border-radius: $card-border-radius;
-
-  .card {
-    &:first-child {
-      border-top: 0;
-      border-top-right-radius: $card-border-radius;
-      border-top-left-radius: $card-border-radius;
-    }
-    &:last-child {
-      border-bottom: 0;
-    }
-  }
-}
-</style>

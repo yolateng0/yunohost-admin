@@ -1,139 +1,137 @@
+<script setup lang="ts">
+import { reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+import api from '@/api'
+import { useAutoModal } from '@/composables/useAutoModal'
+import type { Obj } from '@/types/commons'
+import type { MigrationList } from '@/types/core/api'
+
+// FIXME not tested with pending migrations (disclaimer and stuff)
+const { t } = useI18n()
+const modalConfirm = useAutoModal()
+
+const { pending, done, checked } = await api
+  .fetchAll<
+    [MigrationList, MigrationList]
+  >([{ uri: 'migrations?pending' }, { uri: 'migrations?done' }])
+  .then(([{ migrations: pending }, { migrations: done }]) => {
+    const checked = {} as Obj<boolean | undefined>
+    return {
+      pending: pending.length
+        ? reactive(
+            pending
+              .map((migration) => {
+                if (migration.disclaimer) {
+                  migration.disclaimer =
+                    migration.disclaimer.replaceAll('\n', '<br>') ?? null
+                  checked[migration.id] = false
+                }
+                return migration
+              })
+              .reverse(),
+          )
+        : null,
+      done: done.length ? done.reverse() : null,
+      checked: reactive(checked),
+    }
+  })
+
+function runMigrations() {
+  // Check that every migration's disclaimer has been checked.
+  if (Object.values(checked).every((value) => value === true)) {
+    api.put({ uri: 'migrations?accept_disclaimer' }).then(() => api.refetch())
+  }
+}
+
+async function skipMigration(id: string) {
+  const confirmed = await modalConfirm(t('confirm_migrations_skip'))
+  if (!confirmed) return
+  api
+    .put({ uri: '/migrations/' + id, data: { skip: '', targets: id } })
+    .then(() => api.refetch())
+}
+</script>
+
 <template>
-  <view-base :queries="queries" @queries-response="onQueriesResponse" ref="view">
+  <div>
     <!-- PENDING MIGRATIONS -->
-    <card :title="$t('migrations_pending')" icon="cogs" no-body>
-      <template #header-buttons v-if="pending">
-        <b-button size="sm" variant="success" @click="runMigrations">
-          <icon iname="play" /> {{ $t('run') }}
-        </b-button>
+    <YCard :title="$t('migrations_pending')" icon="cogs" no-body>
+      <template v-if="pending" #header-buttons>
+        <BButton size="sm" variant="success" @click="runMigrations">
+          <YIcon iname="play" /> {{ $t('run') }}
+        </BButton>
       </template>
 
-      <b-card-body v-if="pending === null">
+      <BCardBody v-if="pending === null">
         <span class="text-success">
-          <icon iname="check-circle" /> {{ $t('migrations_no_pending') }}
+          <YIcon iname="check-circle" /> {{ $t('migrations_no_pending') }}
         </span>
-      </b-card-body>
+      </BCardBody>
 
-      <b-list-group v-else-if="pending" flush>
-        <b-list-group-item
-          v-for="{ number, description, id, disclaimer } in pending" :key="number"
+      <BListGroup v-else-if="pending" flush>
+        <BListGroupItem
+          v-for="{ number, description, id, disclaimer } in pending"
+          :key="number"
         >
           <div class="d-flex align-items-center">
             {{ number }}. {{ description }}
 
-            <div class="ml-auto">
-              <b-button @click="skipMigration(id)" size="sm" variant="warning">
-                <icon iname="close" /> {{ $t('skip') }}
-              </b-button>
+            <div class="ms-auto">
+              <BButton
+                size="sm"
+                variant="warning"
+                class="d-flex align-items-center ms-2"
+                @click="skipMigration(id)"
+              >
+                <YIcon iname="close" /> {{ $t('skip') }}
+              </BButton>
             </div>
           </div>
 
           <template v-if="disclaimer">
-            <hr>
-            <p v-html="disclaimer" />
+            <hr />
+            <VueShowdown :markdown="disclaimer" />
 
-            <b-form-checkbox
-              :id="'checkbox-' + number" :name="'checkbox-' + number"
-              :aria-describedby="'checkbox-feedback-' + number"
+            <BFormCheckbox
+              :id="'checkbox-' + number"
               v-model="checked[id]"
+              :name="'checkbox-' + number"
+              :aria-describedby="'checkbox-feedback-' + number"
             >
               {{ $t('migrations_disclaimer_check_message') }}
-            </b-form-checkbox>
-
-            <b-form-invalid-feedback
-              v-if="checked[id] === false" :state="false"
+            </BFormCheckbox>
+            <BFormInvalidFeedback
+              v-if="checked[id] === false"
               :id="'checkbox-feedback-' + number"
+              :state="false"
             >
               {{ $t('migrations_disclaimer_not_checked') }}
-            </b-form-invalid-feedback>
+            </BFormInvalidFeedback>
           </template>
-        </b-list-group-item>
-      </b-list-group>
-    </card>
+        </BListGroupItem>
+      </BListGroup>
+    </YCard>
 
     <!-- DONE MIGRATIONS -->
-    <card
-      :title="$t('migrations_done')" icon="cogs"
-      collapsable collapsed no-body
+    <YCard
+      :title="$t('migrations_done')"
+      icon="cogs"
+      collapsible
+      collapsed
+      no-body
     >
-      <b-card-body v-if="done === null">
+      <BCardBody v-if="done === null">
         <span class="text-success">
-          <icon iname="check-circle" /> {{ $t('migrations_no_done') }}
+          <YIcon iname="check-circle" /> {{ $t('migrations_no_done') }}
         </span>
-      </b-card-body>
+      </BCardBody>
 
-      <b-list-group flush v-else-if="done">
-        <b-list-group-item v-for="{ number, description } in done" :key="number">
+      <BListGroup v-else-if="done" flush>
+        <BListGroupItem v-for="{ number, description } in done" :key="number">
           {{ number }}. {{ description }}
-        </b-list-group-item>
-      </b-list-group>
-    </card>
-
-    <template #skeleton>
-      <card-list-skeleton :item-count="3" />
-      <b-card no-body>
-        <template #header>
-          <b-skeleton width="30%" height="36px" class="m-0" />
-        </template>
-      </b-card>
-    </template>
-  </view-base>
+        </BListGroupItem>
+      </BListGroup>
+    </YCard>
+  </div>
 </template>
-
-<script>
-import api from '@/api'
-
-// FIXME not tested with pending migrations (disclaimer and stuff)
-export default {
-  name: 'ToolMigrations',
-
-  data () {
-    return {
-      queries: [
-        ['GET', 'migrations?pending'],
-        ['GET', 'migrations?done']
-      ],
-      pending: undefined,
-      done: undefined,
-      checked: {}
-    }
-  },
-
-  methods: {
-    onQueriesResponse ({ migrations: pending }, { migrations: done }) {
-      this.done = done.length ? done.reverse() : null
-      pending.forEach(migration => {
-        if (migration.disclaimer) {
-          migration.disclaimer = migration.disclaimer.replaceAll('\n', '<br>')
-          this.$set(this.checked, migration.id, null)
-        }
-      })
-      // FIXME change to pending
-      this.pending = pending.length ? pending.reverse() : null
-    },
-
-    runMigrations () {
-      // Display an error on migration's disclaimer that aren't checked.
-      for (const [id, value] of Object.entries(this.checked)) {
-        if (value !== true) {
-          this.checked[id] = false
-        }
-      }
-      // Check that every migration's disclaimer has been checked.
-      if (Object.values(this.checked).every(value => value === true)) {
-        api.put('migrations?accept_disclaimer', {}, 'migrations.run').then(() => {
-          this.$refs.view.fetchQueries()
-        })
-      }
-    },
-
-    async skipMigration (id) {
-      const confirmed = await this.$askConfirmation(this.$i18n.t('confirm_migrations_skip'))
-      if (!confirmed) return
-      api.put('/migrations/' + id, { skip: '', targets: id }, 'migration.skip').then(() => {
-        this.$refs.view.fetchQueries()
-      })
-    }
-  }
-}
-</script>

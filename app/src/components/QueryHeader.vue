@@ -1,96 +1,106 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+
+import { useInfos } from '@/composables/useInfos'
+import type { APIRequest } from '@/composables/useRequests'
+import { STATUS_VARIANT } from '@/helpers/yunohostArguments'
+
+const props = defineProps<{
+  request: APIRequest
+  type: 'overlay' | 'history'
+}>()
+
+const emit = defineEmits<{ showError: [id: string] }>()
+
+const { currentUser } = useInfos()
+const statusVariant = computed(() => STATUS_VARIANT[props.request.status])
+const errors = computed(() => props.request.action?.errors)
+const warnings = computed(() => props.request.action?.warnings)
+
+const dateOrTime = computed(() => {
+  // returns date if date < today else time
+  const date = new Date(props.request.date)
+  const dateString = date.toLocaleDateString()
+  if (new Date().toLocaleDateString() !== dateString) return dateString
+  return date.toLocaleTimeString()
+})
+
+const caller = computed(() => {
+  const caller = props.request.action?.caller
+  return caller && caller !== currentUser.value ? caller : null
+})
+</script>
+
 <template>
-  <div class="query-header w-100" v-on="$listeners" v-bind="$attrs">
-    <!-- STATUS -->
-    <span class="status" :class="['bg-' + color, statusSize]" :aria-label="$t('api.query_status.' + request.status)" />
+  <div class="query-header d-flex align-items-center w-100">
+    <!--
+    i18n: api.query_status.error
+    i18n: api.query_status.pending
+    i18n: api.query_status.success
+    i18n: api.query_status.warning
+    -->
+    <span
+      class="status"
+      :class="[`bg-${statusVariant}`, type]"
+      :aria-label="$t(`api.query_status.${request.status}`)"
+    />
 
-    <!-- REQUEST DESCRIPTION -->
-    <strong class="request-desc">
-      {{ request.humanRoute }}
-    </strong>
+    <!-- tabindex 0 on title for focus-trap when no tabable elements -->
+    <div>
+      <strong :tabindex="type === 'overlay' ? 0 : undefined">
+        {{ request.title }}
+      </strong>
+      <span v-if="caller"> ({{ $t('history.started_by', { caller }) }})</span>
+    </div>
 
-    <div v-if="request.errors || request.warnings">
-      <!-- WEBSOCKET ERRORS COUNT -->
-      <span class="count" v-if="request.errors">
-        {{ request.errors }}<icon iname="bug" class="text-danger ml-1" />
+    <div v-if="errors || warnings">
+      <span v-if="errors" class="ms-2">
+        {{ errors }}<YIcon iname="bug" class="text-danger ms-1" />
       </span>
-      <!-- WEBSOCKET WARNINGS COUNT -->
-      <span class="count" v-if="request.warnings">
-        {{ request.warnings }}<icon iname="warning" class="text-warning ml-1" />
+      <span v-if="warnings" class="ms-2">
+        {{ warnings }}<YIcon iname="warning" class="text-warning ms-1" />
       </span>
     </div>
 
-    <!-- VIEW ERROR BUTTON -->
-    <b-button
-      v-if="showError && request.error"
-      size="sm" pill
-      class="error-btn ml-auto py-0"
-      variant="danger"
-      @click="reviewError"
-    >
-      <small v-t="'api_error.view_error'" />
-    </b-button>
+    <template v-if="type === 'history'">
+      <BButton
+        v-if="request.err"
+        size="sm"
+        pill
+        class="error-btn ms-auto py-0"
+        variant="danger"
+        @click.stop="emit('showError', request.id)"
+      >
+        <small v-t="'api_error.view_error'" />
+      </BButton>
 
-    <!-- TIME DISPLAY -->
-    <time v-if="showTime" :datetime="request.date | hour" :class="request.error ? 'ml-2' : 'ml-auto'">
-      {{ request.date | hour }}
-    </time>
+      <time :datetime="dateOrTime" :class="request.err ? 'ms-2' : 'ms-auto'">
+        {{ dateOrTime }}
+      </time>
+    </template>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'QueryHeader',
-
-  props: {
-    request: { type: Object, required: true },
-    statusSize: { type: String, default: '' },
-    showTime: { type: Boolean, default: false },
-    showError: { type: Boolean, default: false }
-  },
-
-  computed: {
-    color () {
-      const statuses = {
-        pending: 'primary',
-        success: 'success',
-        warning: 'warning',
-        error: 'danger'
-      }
-      return statuses[this.request.status]
-    },
-
-    errorsCount () {
-      return this.request.messages.filter(({ type }) => type === 'danger').length
-    },
-
-    warningsCount () {
-      return this.request.messages.filter(({ type }) => type === 'warning').length
-    }
-  },
-
-  methods: {
-    reviewError () {
-      this.$store.dispatch('REVIEW_ERROR', this.request)
-    }
-  },
-
-  filters: {
-    readableUri (uri) {
-      return uri.split('?')[0].split('/').join(' > ') // replace('/', ' > ')
-    },
-
-    hour (date) {
-      return new Date(date).toLocaleTimeString()
-    }
-  }
-}
-</script>
-
 <style lang="scss" scoped>
-div {
-  display: flex;
-  align-items: center;
+.query-header {
   font-size: $font-size-sm;
+}
+
+.status {
+  display: inline-block;
+  border-radius: 50%;
+
+  &.history {
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-right: 0.5rem;
+  }
+
+  &.overlay {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+  }
 }
 
 .error-btn {
@@ -101,36 +111,8 @@ div {
   min-width: 70px;
 }
 
-.status {
-  display: inline-block;
-  border-radius: 50%;
-  width: .75rem;
-  min-width: .75rem;
-  height: .75rem;
-  margin-right: .25rem;
-
-  &.lg {
-    width: 1rem;
-    height: 1rem;
-    margin-right: .5rem;
-  }
-}
-
 time {
-  min-width: 3.5rem;
+  min-width: 3rem;
   text-align: right;
 }
-
-.count {
-  display: flex;
-  align-items: center;
-  margin-left: .5rem;
-}
-
-@include media-breakpoint-down(xs) {
-  .xs-hide .request-desc {
-    display: none;
-  }
-}
-
 </style>

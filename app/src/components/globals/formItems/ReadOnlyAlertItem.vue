@@ -1,35 +1,30 @@
-<template>
-  <b-alert class="d-flex flex-column flex-md-row align-items-center" :variant="type" show>
-    <icon :iname="icon_" class="mr-md-3 mb-md-0 mb-2" :variant="type" />
+<script setup lang="ts">
+import { computed } from 'vue'
 
-    <vue-showdown
-      :markdown="label" flavor="github"
-      tag="span" class="markdown"
-    />
-  </b-alert>
-</template>
+import type { ReadOnlyAlertItemProps } from '@/types/form'
 
-<script>
-export default {
-  name: 'ReadOnlyAlertItem',
+const props = withDefaults(defineProps<ReadOnlyAlertItemProps>(), {
+  id: undefined,
+  icon: undefined,
+  type: 'success',
+})
 
-  props: {
-    id: { type: String, default: null },
-    label: { type: String, default: null },
-    type: { type: String, default: null },
-    icon: { type: String, default: null }
-  },
-
-  computed: {
-    icon_ () {
-      const icons = {
-        success: 'thumbs-up',
-        info: 'info',
-        warning: 'exclamation',
-        danger: 'times'
-      }
-      return this.icon || icons[this.type]
-    }
+const icon = computed(() => {
+  // TODO merge with `DEFAULT_VARIANT_ICON`
+  const icons = {
+    success: 'thumbs-up',
+    info: 'info',
+    warning: 'exclamation',
+    danger: 'times',
   }
-}
+
+  return props.icon || icons[props.type]
+})
 </script>
+
+<template>
+  <!-- TODO ally: do we set it as a true alert or is it cosmetic? -->
+  <YAlert :id="id" alert :icon="icon" :variant="type">
+    <VueShowdown :markdown="label" tag="span" class="markdown" />
+  </YAlert>
+</template>

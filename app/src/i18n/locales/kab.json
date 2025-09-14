@@ -14,10 +14,11 @@
     "all": "Akk",
     "api": {
         "query_status": {
-            "pending": "Iteddu"
-        }
+            "pending": "Iteddu",
+            "error": "Ur yeddi ara akken iwata"
+        },
+        "unknown_request": "Taɣult tarussint"
     },
-    "connection": "Tuqqna",
     "created_at": "Yettwarna di",
     "domain_name": "Isem n Taɣult",
     "domains": "Tiɣula",
@@ -25,16 +26,11 @@
     "enable": "Rmed",
     "enabled": "Yermed",
     "error": "Tuccḍa",
-    "go_back": "Uɣal ɣer deffir",
-    "group_new": "Agraw amaynut",
+    "group_add": "Agraw amaynut",
     "permissions": "Tisirag",
     "history": {
         "title": "Amazray",
-        "last_action": "Tigawt taneggarut:",
-        "methods": {
-            "DELETE": "Kkes",
-            "GET": "ɣeṛ"
-        }
+        "last_action": "Tigawt taneggarut:"
     },
     "home": "Agejdan",
     "id": "ID",
@@ -42,15 +38,13 @@
     "infos": "talɣut",
     "next": "Suivant",
     "no": "Uhu",
-    "nobody": "Ula yiwen",
     "ok": "Ih",
     "open": "Ldi",
-    "operations": "timhalin",
+    "operations": "Timhalin",
     "logs": "Aɣmis",
     "logs_error": "Tuccḍa",
     "logs_ended_at": "Fin",
     "logs_started_at": "Démarrer",
-    "logs_context": "Asatal",
     "port": "Port",
     "previous": "Précédent",
     "service_start_on_boot": "Bdu seg usenker",
@@ -58,52 +52,45 @@
     "tools": "Ifecka",
     "tools_webadmin": {
         "cache": "Tuffirt",
-        "language": "Tutlayt"
+        "language": "Tutlayt",
+        "fallback_language": "Tutlayt tis snat"
     },
     "udp": "UDP",
     "unignore": "Ur yettwazgel ara",
-    "uninstall": "Désinstaller",
     "unknown": "D arussin",
     "url": "URL",
     "user_email": "Imayl",
     "user_fullname": "Isem inek ummid",
-    "user_interface_link": "Agrudem n useqdac",
+    "user_interface_link": "Awwur",
     "version": "Lqem",
     "words": {
         "browse": "Snirem",
         "collapse": "Ḍfes",
-        "default": "Prédéfini(e)",
         "link": "Aseɣwen",
         "none": "Ula d yiwen",
         "separator": ", ",
-        "valid": "Tettwaqbel"
+        "comment": "Awennit",
+        "edit": "Ẓreg"
     },
     "yes": "Ih",
     "api_error": {
-        "error_message": "Izen n tuccḍa:"
+        "error_message": "Izen n tuccḍa:",
+        "view_error": "Wali tuccḍa"
     },
-    "app_make_default": "Err-it d amezwer",
     "applications": "Isnasen",
-    "backup": "Sekles",
+    "backup": "Asekles",
     "backup_action": "Sekles",
     "begin": "Bdu",
     "cancel": "Sefsex",
     "catalog": "Akaram",
     "check": "Rrcem",
     "close": "Mdel",
-    "code": "Tangalt",
-    "common": {
-        "firstname": "Isem",
-        "lastname": "Isem n tmagit"
-    },
-    "dead": "D arurmid",
     "delete": "Kkes",
     "configuration": "Tawila",
     "description": "Asnummel",
     "details": "Talqayt",
     "disable": "Désactiver",
     "disabled": "Ittwarermed",
-    "experimental": "Expérimental",
     "firewall": "Aɣṛab n tmes",
     "group_name": "Isem n wegraw",
     "footer": {
@@ -118,10 +105,7 @@
     "hook_data_mail": "Imayl",
     "install": "sebdeed",
     "installation_complete": "Asebded immed",
-    "installed": "Yettwasbedd",
-    "label": "Tabzimt",
-    "license": "Licence",
-    "login": "Aseqdac",
+    "login": "Qqen",
     "logout": "Tufɣa",
     "manage_users": "Sefrek iseqdacen",
     "others": "Wiyyaḍ",
@@ -132,10 +116,9 @@
     "restart": "Ales tanekra",
     "protocol": "Protocole",
     "restore": "Err-d",
-    "retry": "Ɛreḍ tikkelt-nniḍen",
     "run": "Selkem",
     "running": "En cours d'exécution",
-    "save": "Sekles",
+    "save": "Ḥrez",
     "select_all": "Fren akk",
     "size": "Teɣzi",
     "skip": "Zgel",
@@ -147,15 +130,126 @@
     "tcp": "TCP",
     "tools_reboot_btn": "Alles asekker",
     "tools_shutdown_btn": "Sexsi",
-    "user_username": "Nom d'utilisateur",
+    "user_username": "Isem n useqdac",
     "users": "Iseqdacen",
-    "administration_password": "Awal uffir n tedbelt",
-    "domain": {
-        "dns": {
-            "methods": {
-                "none": "Ula d yiwen"
-            }
+    "group_admins": "Inedbalen",
+    "footer_version": "Yezreɛ-it <a href='https://yunohost.org'>YunoHost</a> {version} ({repo}).",
+    "users_add": "Aseqdac amaynut",
+    "tools_yunohost_settings": "Iɣewwaṛen n YunoHost",
+    "user_username_edit": "Ẓreg amaɣnu n {name}",
+    "manage_apps": "Sefrek isnasen",
+    "manage_domains": "Sefrek tiɣula",
+    "storage": "Aḥraz",
+    "storage_disks": {
+        "infos": {
+            "serial_unknown": "Arussin",
+            "size": "Tiddi:",
+            "type": "Anaw:"
+        },
+        "category_name": "Iḍebsiyen iquṛanen",
+        "infos_meta": {
+            "usb": "Ibenk USB"
         }
     },
-    "group_admins": "Inedbalen"
+    "all_apps": "Akk isnasen",
+    "app_choose_category": "Fren taggayt",
+    "domain_add": "Rnu taɣult",
+    "form_errors": {
+        "remote": "{message}",
+        "pattern": "{type}"
+    },
+    "domain": {
+        "types": {
+            "main_domain": "Taɣult tagejdant"
+        },
+        "cert": {
+            "types": {
+                "other": "Wayeḍ/Arussin",
+                "letsencrypt": "Let's Encrypt"
+            }
+        },
+        "dns": {
+            "auto_config_zone": "Tamnaḍt tamirant n DNS"
+        }
+    },
+    "app": {
+        "links": {
+            "website": "Asmel web unṣib",
+            "title": "Asaɣen",
+            "license": "Turagt n usnas"
+        },
+        "integration": {
+            "ldap": {
+                "true": "Seqdec imiḍanen n YunoHost akken ad teqqneḍ (LDAP)"
+            }
+        },
+        "doc": {
+            "admin": {
+                "title": "Isemli adeblan"
+            },
+            "notifications": {
+                "understood": "Gziɣ"
+            }
+        },
+        "installed_version": "Lqem yettwasbedden:"
+    },
+    "yunohost_admin": "Anedbal YunoHost",
+    "hook_conf_ynh_settings": "Twilat n YunoHost",
+    "loading": "Aɛebbi",
+    "tos": {
+        "i_agree": "Qebleɣ"
+    },
+    "users_import": "Kter imiḍanen",
+    "install_name": "Asebded n {id}",
+    "app_install_parameters": "Iɣewwaren n usebded",
+    "failed": "Tuccḍa",
+    "hook_data_home": "Isefka n imiḍanen",
+    "hook_data_multimedia": "Isefka agetmidya",
+    "issues": "{count} n wuguren",
+    "manage_groups": "Asefrek n wagrawen",
+    "tools_shutdown_reboot": "Sexsi/Ales asekker",
+    "tools_webadmin_settings": "Iɣewwaren n tnedbalt Web",
+    "stopped": "Yettwaseḥbes",
+    "users_export": "Sifeḍ imiḍanen",
+    "users_import_csv_file": "Afaylu CSV",
+    "quick_action": "Timerniwt taruradt",
+    "everything_good": "Kullec igerrez!",
+    "hook_conf_ynh_certs": "Iselkinen SSL",
+    "placeholder": {
+        "username": "winnanatwinatan",
+        "domain": "my-domain.com",
+        "fullname": "Tinna n Wat Winnat",
+        "groupname": "Isem n wegraw-iw"
+    },
+    "ports": "Tiwwura",
+    "app_state_broken": "Iṛṛeẓ",
+    "app_show_categories": "Sken-d taggayin",
+    "upnp": "UPnP",
+    "form": {
+        "current_file": "Afaylu amiran:"
+    },
+    "backup_new": "Aḥraz amaynut",
+    "ignored": "{count} yettwanef",
+    "postinstall": {
+        "title": "Aglezasbeddi"
+    },
+    "since": "seg",
+    "local_archives": "Taṛcivt tadigant",
+    "logs_suboperations": "Timehlin tirnawin",
+    "hook_conf_ldap": "Taffa n yisefka n yiseqdacen",
+    "user_new_forward": "newforward{'@'}myforeigndomain.org",
+    "system_upgrade_all_packages_btn": "Mucceḍ ikemmusen s umata",
+    "tools_reboot": "Ales asekker n uqeddac-ik·im",
+    "tools_shutdown": "Sexsi aqeddac-ik·im",
+    "postinstall_set_domain": "Sbadu d taɣult tamezwarut",
+    "logs_more": "Sken-d ugar n yezriren",
+    "search": {
+        "for": "Anadi ɣef {items}…"
+    },
+    "custom_app_install": "Sebded asnas udmawan",
+    "group_add_permission": "Rnu tasiregt",
+    "set_default": "Sbadu d amezwer",
+    "backup_create": "Snulfu-d taḥerzet",
+    "system_update": "Amucceḍ n unagraw",
+    "system_upgrade_all_applications_btn": "Mucceḍ isnasen s umata"
 }

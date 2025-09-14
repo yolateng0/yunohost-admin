@@ -1,13 +1,8 @@
 {
     "action": "Azione",
     "add": "Aggiungi",
-    "administration_password": "Password amministrazione",
     "api_not_responding": "Le API YunoHost non rispondono. Forse 'yunohost-api' è giù o è stato riavviato?",
-    "app_info_access_desc": "Gruppi / utenti attualmente autorizzati ad accedere a questa applicazione:",
-    "app_info_default_desc": "Redirigi root dominio su questa applicazione ({domain}).",
-    "app_info_uninstall_desc": "Rimuovi questa applicazione.",
     "app_install_custom_no_manifest": "Nessun file manifest.json",
-    "app_make_default": "Imposta predefinito",
     "applications": "Applicazioni",
     "archive_empty": "Archivio vuoto",
     "backup": "Backup",
@@ -15,24 +10,16 @@
     "backup_content": "Contenuto del backup",
     "backup_create": "Creare un backup",
     "backup_new": "Nuovo backup",
-    "both": "Entrambi",
     "close": "Chiudi",
-    "confirm_app_default": "Sei sicuro di voler impostare questa app come predefinita?",
     "confirm_change_maindomain": "Sei sicuro di voler cambiare il dominio principale?",
     "confirm_delete": "Sei sicuro di voler eliminare {name} ?",
     "confirm_uninstall": "Sei sicuro di voler disinstallare {name} ?",
-    "connection": "Connessione",
     "created_at": "Creato a",
     "custom_app_install": "Installa app personalizzata",
     "delete": "Elimina",
     "description": "Descrizione",
     "disable": "Disabilita",
     "domain_add": "Aggiungi dominio",
-    "domain_add_dns_doc": "… e ho <a href='//yunohost.org/dns_config' target='_blank'>correttamente impostato il mio DNS</a>.",
-    "domain_add_dyndns_doc": "... e voglio un servizio DNS dinamico.",
-    "domain_add_panel_with_domain": "Ho già un nome di domino…",
-    "domain_add_panel_without_domain": "Non ho un nome di domino…",
-    "domain_dns_config": "Configurazione del DNS",
     "domain_name": "Nome a domino",
     "domains": "Domini",
     "download": "Scaricare",
@@ -40,7 +27,6 @@
     "error_modify_something": "Dovresti modificare qualcosa",
     "firewall": "Firewall",
     "home": "Home",
-    "hook_adminjs_group_configuration": "Configurazioni di sistema",
     "hook_conf_ldap": "Database utenti",
     "hook_data_home": "Dati utente",
     "hook_data_mail": "Mail",
@@ -49,21 +35,14 @@
     "infos": "Info",
     "install": "Installa",
     "install_name": "Installa {id}",
-    "install_time": "Tempo installazione",
     "installation_complete": "Installazione completata",
-    "installed": "Installato",
-    "ipv4": "IPv4",
-    "ipv6": "IPv6",
-    "label": "Etichetta",
-    "label_for_manifestname": "Etichetta per {name} (nome mostrato nel portale utente)",
+    "label_for_manifestname": "Etichetta per {name}",
     "login": "Accedi",
     "logout": "Esci",
     "mailbox_quota_description": "Per esempio, 700M è un CD, 4700M è un DVD.",
     "manage_apps": "Gestisci app",
     "manage_domains": "Gestisci domini",
     "manage_users": "Gestisci utenti",
-    "multi_instance": "Può essere installato più volte",
-    "myserver": "mioserver",
     "next": "Successivo",
     "no": "No",
     "open": "Apri",
@@ -93,7 +72,6 @@
     "tools": "Strumenti",
     "udp": "UDP",
     "unauthorized": "Non autorizzato",
-    "uninstall": "Disinstalla",
     "upnp": "UPnP",
     "upnp_disabled": "UPnP è disabilitato.",
     "upnp_enabled": "UPnP è abilitato.",
@@ -104,12 +82,11 @@
     "user_fullname": "Nome completo",
     "user_interface_link": "Interfaccia utente",
     "user_mailbox_quota": "Quota della casella di posta",
-    "user_new_forward": "nuovoinoltro@miodominiodifferente.org",
+    "user_new_forward": "nuovoinoltro{'@'}miodominiodifferente.org",
     "user_username": "Nome utente",
     "user_username_edit": "Modifica account di {name}",
     "users": "Utenti",
-    "users_new": "Nuovo utente",
-    "users_no": "Nessun utente.",
+    "users_add": "Nuovo utente",
     "yes": "Si",
     "app_state_inprogress": "ancora non funzionante",
     "confirm_install_custom_app": "ATTENZIONE! L'installazione di applicazioni di terze parti può compromettere l'integrità e la sicurezza del tuo sistema. Probabilmente NON dovresti installarle a meno che tu non sappia cosa stai facendo. Sei sicuro di volerti prendere questo rischio?",
@@ -119,14 +96,8 @@
     "confirm_postinstall": "Stai per lanciare il processo di post-installazione sul dominio {domain}. Potrebbe richiedere alcuni minuti, *non interrompere l'operazione*.",
     "confirm_restore": "Sei sicuro di volere ripristinare {name} ?",
     "diagnosis": "Diagnosi",
-    "dns": "DNS",
-    "domain_default_desc": "Il dominio predefinito è il dominio di connessione dove gli utenti effettuano l'accesso.",
-    "domain_default_longdesc": "Questo è il tuo dominio predefinito.",
-    "domain_delete_longdesc": "Rimuovi questo dominio",
-    "domain_dns_longdesc": "Vedi la configurazione DNS",
     "error_server_unexpected": "Errore server inaspettato",
     "footer_version": "Offerto da <a href='https://yunohost.org'>YunoHost</a> {version} ({repo}).",
-    "form_input_example": "Esempio: {example}",
     "hook_conf_ynh_certs": "Certificati SSL",
     "hook_data_home_desc": "Dati dell'utente posizionati in /home/USER",
     "local_archives": "Archivi locali",
@@ -138,21 +109,15 @@
     "system_update": "Aggiornamento del sistema",
     "user_mailbox_use": "Spazio utilizzato dalla casella di posta",
     "ok": "OK",
-    "app_info_changeurl_desc": "Cambia l'URL di accesso di questa applicazione (dominio e/o percorso).",
-    "app_info_change_url_disabled_tooltip": "Questa funzionalità non è ancora stata implementata in questa applicazione",
     "confirm_app_change_url": "Sei sicuro di voler cambiare l'URL di accesso all'applicazione ?",
-    "confirm_firewall_allow": "Sei sicuro di voler aprire la porta {port}? (protocollo: {protocol}, connessione: {connection})",
-    "confirm_firewall_disallow": "Sei sicuro di voler chiudere la porta {port}? (protocollo: {protocol}, connessione: {connection})",
     "confirm_migrations_skip": "Saltare le migrazioni è sconsigliato. Sei sicuro di volerlo fare?",
     "confirm_service_start": "Sei sicuro di voler eseguire {name}?",
     "confirm_service_stop": "Sei sicuro di voler fermare {name}?",
-    "confirm_update_apps": "Sei sicuro di voler aggiornare tutte le applicazioni?",
-    "confirm_update_specific_app": "Sei sicuro di voler aggiornare {app}?",
     "confirm_upnp_enable": "Sei sicuro di voler abilitare UPnP?",
     "confirm_upnp_disable": "Sei sicuro di voler disabilitare UPnP?",
     "confirm_reboot_action_reboot": "Sei sicuro di voler riavviare il tuo server?",
     "confirm_reboot_action_shutdown": "Sei sicuro di voler spegnere il tuo server?",
-    "domain_dns_conf_is_just_a_recommendation": "Questa pagina ti mostra la configurazione *raccomandata*. *Non* configura il DNS per te. Configurare le tue zone DNS nel registrar DNS in accordo con queste raccomandazioni è compito tuo.",
+    "domain_dns_conf_is_just_a_recommendation": "Questa sezione mostra la configurazione *raccomandata*. *Non* configura il DNS per te. Configurare le tue zone DNS nel registrar DNS in accordo con queste raccomandazioni è compito tuo.",
     "migrations": "Migrazioni",
     "migrations_pending": "Migrazioni in attesa",
     "migrations_done": "Migrazioni precedenti",
@@ -167,30 +132,17 @@
     "tools_shutdown": "Spegni il tuo server",
     "tools_shutdown_btn": "Spegnere",
     "tools_shutdown_reboot": "Spegnere/Riavviare",
-    "certificate_manage": "Gestisci certificato SSL",
-    "certificate": "Certificato",
     "all_apps": "Tutte le app",
-    "confirm_install_app_lowquality": "Attenzione: questa applicazione può funzionare ma non è ben integrata in Yunohost. Alcune funzionalità come il single sign-on (accesso unico) e backup/ripristino potrebbero non essere disponibili.",
-    "confirm_install_app_inprogress": "ATTENZIONE! Questa applicazione è ancora sperimentale (se non esplicitamente non funzionante) ed è probabile che rovini il tuo sistema! Probabilmente NON dovresti installarla a meno che tu non sappia cosa stai facendo. Sei sicuro di voler prenderti questo rischio?",
     "error_connection_interrupted": "Il server ha chiuso la connessione invece che rispondere. Probabilmente nginx o le API di YunoHost sono stato riavviati per qualche ragione?",
-    "experimental_warning": "Attenzione: questa funzionalità è sperimentale e non è considerata stabile, non dovresti utilizzarla a meno che tu non sappia cosa stai facendo.",
     "good_practices_about_admin_password": "Ora stai per impostare una nuova password di amministratore. La password dovrebbe essere di almeno 8 caratteri - anche se è buona pratica utilizzare password più lunghe (es. una sequenza di parole) e/o utilizzare vari tipi di caratteri (maiuscole, minuscole, numeri e simboli).",
     "good_practices_about_user_password": "Ora stai per impostare una nuova password utente. La password dovrebbe essere di almeno 8 caratteri - anche se è buona pratica utilizzare password più lunghe (es. una sequenza di parole) e/o utilizzare vari tipi di caratteri (maiuscole, minuscole, numeri e simboli).",
     "only_working_apps": "Solo app funzionanti",
     "logs": "Registri",
     "logs_operation": "Operazioni fatte sul sistema con YunoHost",
-    "logs_history": "Cronologia dei comandi eseguiti sul sistema",
-    "logs_package": "Cronologia della gestione dei pacchetti Debian",
-    "logs_system": "Registri del kernel ed altri eventi di basso livello",
-    "logs_access": "Lista degli accessi e ban",
-    "logs_service": "Registri dei servizi",
-    "logs_app": "Registri delle app",
-    "logs_no_logs_registered": "Nessun registro associato a questa categoria",
     "logs_error": "Errore",
     "logs_ended_at": "Fine",
     "logs_started_at": "Inizio",
     "logs_path": "Percorso",
-    "logs_context": "Contesto",
     "logs_share_with_yunopaste": "Condividi con YunoPaste",
     "logs_more": "Mostra più linee",
     "select_all": "Seleziona tutto",
@@ -213,12 +165,14 @@
     "everything_good": "Tutto ok!",
     "from_to": "da {0} a {1}",
     "configuration": "Configuratione",
-    "group_new": "Nuovo gruppo",
+    "group_add": "Nuovo gruppo",
     "warnings": "{count} avvisi",
     "words": {
-        "default": "Predefinito",
         "collapse": "Collassa",
-        "browse": "Naviga"
+        "browse": "Naviga",
+        "none": "Nessuno",
+        "separator": ", ",
+        "link": "Collegamento"
     },
     "unignore": "Non ignorare più",
     "since": "da",
@@ -230,8 +184,6 @@
     "orphaned": "Non mantenuta",
     "only_decent_quality_apps": "Solo applicazioni di qualità decente",
     "only_highquality_apps": "Solo applicazioni di alta qualità",
-    "nobody": "Nessuno",
-    "license": "Licenza",
     "last_ran": "Ultima esecuzione:",
     "issues": "{count} problemi",
     "ignored": "{count} ignorato",
@@ -239,7 +191,7 @@
     "permissions": "Permessi",
     "groups_and_permissions_manage": "Gestisci i gruppi e i permessi",
     "groups_and_permissions": "Gruppi e permessi",
-    "group_specific_permissions": "Permessi specifici per l'utente",
+    "group_specific_permissions": "Permessi per l’utente singolo",
     "group_explain_visitors_needed_for_external_client": "Poni attenzione al fatto che dovrai dare l'accesso ai visitatori ad alcune applicazioni se pensi di usarle con dei client esterni. Ad esempio questo è il caso di Nextcloud nel caso tu lo voglia usare con un client di sincronizzazione dal tuo smartphone o dal computer desktop.",
     "group_explain_visitors": "Questo è un gruppo speciale che individua i visitatori anonimi",
     "run_first_diagnosis": "Avvio diagnosi iniziali",
@@ -250,13 +202,10 @@
     "app_state_lowquality_explanation": "Questa applicazione può essere funzionale ma potrebbe presentare dei problemi oppure non essere pienamente integrata con YunoHost oppure non rispettare le pratiche consigliate.",
     "app_state_lowquality": "bassa qualità",
     "all": "Tutti",
-    "pending_migrations": "Ci sono alcune migrazioni in sospeso in attesa di essere eseguite. Consulta <a href='#/tools/migrations'>Tools > Migrations</a> per visualizzarle.",
-    "tip_about_user_email": "Gli utenti sono creati associati ad un indirizzo email (e un account XMPP) del tipo utente@domain.tld. Indirizzi email addizionali e forward possono essere aggiunti successivamente dall'amministratore e dall'utente.",
+    "pending_migrations": "Ci sono alcune migrazioni in sospeso in attesa di essere eseguite. Vai in <a href='#/tools/migrations'>Strumenti > Migrazioni</a> per eseguirle.",
+    "tip_about_user_email": "Gli utenti sono creati associati ad un indirizzo email (e un account XMPP) del tipo utente{'@'}domain.tld. Indirizzi email addizionali e forward possono essere aggiunti successivamente dall'amministratore e dall'utente.",
     "logs_suboperations": "Sub-operazioni",
-    "permission_show_tile_enabled": "Mostra il tile nel portale dell'utente",
     "permission_main": "Etichetta principale",
-    "permission_corresponding_url": "URL corrispondente",
-    "app_manage_label_and_tiles": "Gestisci etichette e tiles",
     "user_emailforward_add": "Aggiungi un reindirizzamento mail",
     "user_emailaliases_add": "Aggiungi un alias mail",
     "unknown": "Sconosciuto",
@@ -270,50 +219,42 @@
         "cache": "Cache",
         "fallback_language_description": "Lingua utilizzata nel caso che la traduzione non sia disponibile.",
         "fallback_language": "Lingua di riserva",
-        "language": "Lingua"
+        "language": "Lingua",
+        "theme": "Attiva o disattiva la modalità scura"
     },
     "search": {
         "not_found": "Ci sono {items} che corrispondono ai tuoi criteri. | C’è un {items} che corrisponde ai tuoi criteri. | Ci sono {items} che corrispondono ai tuoi criteri.",
-        "for": "Cerca per {items}..."
+        "for": "Cerca per {items}…"
     },
-    "readme": "Leggimi",
     "postinstall_set_domain": "Imposta dominio principale",
     "placeholder": {
         "domain": "mio-dominio.it",
         "groupname": "Nome del mio gruppo",
-        "lastname": "Rossi",
-        "firstname": "Mario",
         "username": "mariorossi",
-        "file": "Scegli un file o trascinalo qui"
+        "file": "Scegli un file o trascinalo qui",
+        "fullname": "Mario Rossi"
     },
-    "perform": "Eseguire",
     "migrations_disclaimer_not_checked": "Questa migrazione necessita della tua accettazione delle condizioni d'utilizzo prima di essere eseguita.",
     "migrations_disclaimer_check_message": "Ho letto e compreso le condizioni d'utilizzo",
     "mailbox_quota_example": "700MB è un CD, 4700M è un DVD",
     "items_verbose_count": "Ci sono {items}. | C’è 1 {items}. | Ci sono {items}.",
     "items": {
-        "users": "nessun utente | utente | {c} utenti",
-        "services": "nessun servizio | servizio | {c} servizi",
-        "logs": "nessun log | log | {c} logs",
-        "installed_apps": "nessun app installata | app installata | {c} apps installate",
-        "groups": "nessun gruppo | gruppo | {c} gruppi",
-        "domains": "nessun dominio | dominio | {c} domini",
-        "backups": "nessun backup | backup | {c} backups",
-        "apps": "nessuna app | app | {c} apps",
-        "permissions": "nessun permesso | permesso | {c} permessi"
+        "users": "nessun utente | utente | utenti",
+        "services": "nessun servizio | servizio | servizi",
+        "logs": "nessun log | log | logs",
+        "installed_apps": "nessun app installata | app installata | apps installate",
+        "groups": "nessun gruppo | gruppo | gruppi",
+        "domains": "nessun dominio | dominio | domini",
+        "backups": "nessun backup | backup | backups",
+        "apps": "nessuna app | app | apps",
+        "permissions": "nessun permesso | permesso | permessi",
+        "items": "Nessun elemento | elemento | elementi"
     },
     "history": {
-        "methods": {
-            "PUT": "modifica",
-            "POST": "crea/esegui",
-            "GET": "leggi",
-            "DELETE": "elimina"
-        },
         "last_action": "Ultima azione:",
         "title": "Cronologia",
         "is_empty": "Nessuno storico per ora."
     },
-    "go_back": "Torna indietro",
     "form_errors": {
         "required": "Campo richiesto.",
         "passwordMatch": "Le password non coincidono.",
@@ -322,44 +263,35 @@
         "notInUsers": "L'utente '{value}' esiste già.",
         "minValue": "Il valore dev'essere maggiore o uguale a {min}.",
         "name": "I nomi non devono includere caratteri speciali, tolti <code> ,.'-</code>",
-        "emailForward": "Inoltro email non valido: dev'esser composta di soli caratteri alfanumerici e <code>_.-+</code> (es: prova+ricevute@esempio.com, m4r1-0@esempio.com)",
-        "email": "Email non valida: dev'esser composta di soli caratteri alfanumerici e <code>_.-</code> (es: prova@esempio.com, m4r1-0@esempio.com)",
+        "emailForward": "Inoltro email non valido: dev'esser composta di soli caratteri alfanumerici e <code>_.-+</code> (es: prova+ricevute{'@'}esempio.com, m4r1-0{'@'}esempio.com)",
+        "email": "Email non valida: dev'esser composta di soli caratteri alfanumerici e <code>_.-</code> (es: prova{'@'}esempio.com, m4r1-0{'@'}esempio.com)",
         "dynDomain": "Nome dominio non valido: Dev'esser composto di soli caratteri alfanumerici minuscoli e trattini",
         "domain": "Nome dominio non valido: Dev'esser composto di soli caratteri alfanumerici minuscoli, punti e trattini",
         "between": "Il valore dev'essere compreso tra {min} e {max}.",
-        "alphalownum_": "Il valore deve contenere solo caratteri alfanumerici minuscoli e underscore.",
+        "alphalownumdot_": "Il valore deve contenere solo caratteri alfanumerici minuscoli e underscore.",
         "alpha": "Il valore deve comprendere solo caratteri alfanumerici.",
         "remote": "{message}",
         "pattern": "{type}",
         "maxValue": "Il valore deve essere un numero uguale o minore di {max}.",
         "invalid_form": "Il modulo contiene alcuni errori.",
-        "appRepoUrl": "Gli URL della repository delle app di YunoHost dovrebbero essere come https://dominio.tld/percorso/alla/repo_ynh"
+        "appRepoUrl": "Gli URL della repository delle app di YunoHost dovrebbero essere come https://dominio.tld/percorso/alla/repo_ynh",
+        "checked": "La casella dev’essere spuntata.",
+        "numValue": "Il valore dev’essere un numero"
     },
     "footer": {
         "donate": "Dona",
         "help": "Serve aiuto?",
-        "documentation": "Documentazione"
+        "documentation": "Documentazione",
+        "tos": "Termini di servizio"
     },
-    "experimental": "Sperimentale",
     "error": "Errore",
     "enabled": "Abilitato",
-    "domain_delete_forbidden_desc": "Non puoi rimuovere '{domain}' fintanto che è il tuo dominio principale, devi prima selezionare un altro dominio (o <a href='#/domains/add'>crearne un'altro</a>) e impostarlo come dominio principale.",
-    "domain_add_dyndns_forbidden": "Hai già sottoscritto un dominio DynDNS, puoi richiedere di rimuovere il tuo dominio DynDNS corrente sul forum <a href='//forum.yunohost.org/t/nohost-domain-recovery-suppression-de-domaine-en-nohost-me-noho-st-et-ynh-fr/442'>nel thread dedicato</a>.",
+    "domain_add_dyndns_forbidden": "Hai già registrato/sottoscritto un dominio DynDNS dal progetto YunoHost. Quest’opzione è intenzionalmente limitata a un solo dominio di questo genere per ciascun server. Se vuoi aggiungere un sottodominio al tuo dominio già sottoscritto, usa l’opzione “Aggiungi un dominio o un sottodominio che possiedo” qui sopra. Se vuoi usare un dominio completamente differente, dovresti prima rimuovere il tuo dominio DynDNS esistente. I domini DynDNS sono un’ottima possibilità per esordire nel self-hosting, ma nel medio/lungo termine raccomandiamo di acquistare il proprio nome dominio, per averne un controllo completo.",
     "disabled": "Disabilitato",
-    "dead": "Inattivo",
     "day_validity": " Scaduto | 1 giorno | {count} giorni",
-    "confirm_app_install": "Sicuro di voler installare questa applicazione?",
-    "common": {
-        "lastname": "Cognome",
-        "firstname": "Nome"
-    },
-    "code": "Codice",
     "app_show_categories": "Mostra categorie",
-    "app_config_panel_no_panel": "Questa applicazione non ha nessuna configurazione disponibile",
-    "app_config_panel_label": "Configura l'app",
-    "app_config_panel": "Pannello configurazioni",
     "app_choose_category": "Scegli una categoria",
-    "api_waiting": "Aspetto la risposta del server...",
+    "api_waiting": "Aspetto la risposta del server…",
     "api_not_found": "Sembra che l'amministratore ha provato a richiedere qualcosa che non esiste.",
     "api_errors_titles": {
         "APIConnexionError": "YunoHost ha riscontrato un errore di connessione",
@@ -384,19 +316,19 @@
             "pending": "In corso",
             "error": "Fallito"
         },
-        "processing": "Il server sta processando la richiesta...",
-        "partial_logs": "[...] (controlla i log completi nella cronologia)",
+        "processing": "Il server sta processando la richiesta…",
+        "partial_logs": "[…] (controlla i log completi nella cronologia)",
         "reconnecting": {
-            "title": "Sto cercando di comunicare con il server...",
-            "failed": "Sembra che il server non stia rispondendo. Puoi riprovare a collegarti oppure prova a dare il comando `systemctl restart yunohost-api` da ssh.",
+            "title": "Sto cercando di comunicare con il server…",
             "reason": {
-                "shutdown": "Il tuo server si sta spegnendo e non è più raggiungibile. Accendilo nuovamente e un prompt di login sarà visualizzato appena il server tornerà raggiungibile.",
-                "unknown": "La connessione al server è stata interrotta per ragioni sconosciute.",
-                "reboot": "Il tuo server si sta riavviando e non sarà raggiungibile per un po'. Il prompt per il login sarà disponibile non appena il server diventerà raggiungibile.",
+                "shutdown": "Il tuo server si sta spegnendo e non è più raggiungibile.",
+                "unknown": "La connessione al server è stata interrotta per ragioni sconosciute. Forse 'yunohost-api' potrebbe essere down?",
+                "reboot": "Il tuo server si sta riavviando e non sarà raggiungibile per un po’.",
                 "upgrade_system": "La connessione al server è stata chiusa per un aggiornamento di YunoHost. Attendi che il server sia nuovamente raggiungibile…"
-            },
-            "success": "Il server è nuovamente raggiungibile! Puoi provare a fare il login"
-        }
+            }
+        },
+        "busy": "Il server è impegnato…",
+        "unknown_request": "Richiesta sconosciuta"
     },
     "address": {
         "local_part_description": {
@@ -409,108 +341,67 @@
         }
     },
     "cancel": "Annulla",
-    "human_routes": {
-        "users": {
-            "update": "Aggiorna utente '{name}'",
-            "delete": "Elimina utente '{name}'",
-            "create": "Crea utente '{name}'"
-        },
-        "upgrade": {
-            "app": "Aggiorna l'app '{app}'",
-            "apps": "Aggiorna tutte le app",
-            "system": "Aggiorna il sistema"
-        },
-        "update": "Controlla aggiornamenti",
-        "shutdown": "Spegni il server",
-        "share_logs": "Genera link per il log '{name}'",
-        "services": {
-            "stop": "Ferma il servizio '{name}'",
-            "start": "Avvio il servizio '{name}'",
-            "restart": "Riavvia il servizio '{name}'"
-        },
-        "reboot": "Riavvia il server",
-        "postinstall": "Esegui il post-install",
-        "permissions": {
-            "remove": "Rimuovi l'accesso per '{perm}' a '{name}'",
-            "add": "Permetti a '{name}' di accedere a '{perm}'"
-        },
-        "migrations": {
-            "skip": "Salta migrazioni",
-            "run": "Esegui migrazioni"
-        },
-        "groups": {
-            "remove": "Rimuovi {'user'} dal gruppo '{name}'",
-            "add": "Aggiungi '{user}' al gruppo '{name}'",
-            "delete": "Elimina gruppo '{name}'",
-            "create": "Crea gruppo '{name}'"
-        },
-        "firewall": {
-            "upnp": "{action} UPnP",
-            "ports": "{action} porta {port} ({protocol}, {connection})"
-        },
-        "domains": {
-            "set_default": "Imposta '{name}' come dominio di default",
-            "delete": "Elimina dominio '{name}'",
-            "add": "Aggiungi dominio '{name}'",
-            "push_dns_changes": "Sincronizza i record DNS al registrar per '{name}'",
-            "update_config": "Aggiorna la configurazione di '{name}'"
-        },
-        "diagnosis": {
-            "unignore": {
-                "warning": "Non ignorare avviso",
-                "error": "Non ignorare errore"
-            },
-            "run_specific": "Esegui diagnosi '{description}'",
-            "run": "Esegui diagnosi",
-            "ignore": {
-                "warning": "Ignora avviso",
-                "error": "Ignora errore"
-            }
-        },
-        "backups": {
-            "restore": "Ripristina backup '{name}'",
-            "delete": "Elimina backup '{name}'",
-            "create": "Crea backup"
-        },
-        "apps": {
-            "update_config": "Aggiorna la configurazione dell'app '{name}'",
-            "uninstall": "Disinstalla l'app '{name}'",
-            "set_default": "Reindirizza la domain root di '{domain}' a '{name}'",
-            "install": "Installa l'app '{name}'",
-            "change_url": "Cambia l'URL d'accesso di '{name}'",
-            "change_label": "Cambia label da '{prevName}' a '{nextName}'"
-        },
-        "reconnecting": "Riconnessione"
-    },
     "postinstall": {
         "force": "Forza il post-install",
-        "title": "Post-installazione"
+        "title": "Post-installazione",
+        "user": {
+            "title": "Crea il primo utente amministratore",
+            "first_user_help": "Questo utente avrà privilegi da amministratore e gli sarà permesso di connettersi sia a quest’interfaccia di amministrazione chee direttamente al server via SSH.\nPoiché si tratta di un utente normale, potrà anche connettersi al portale utente (SSO) con le sue credenziali.\nQuando la post-installazione sarà completa, potrai creare altri utenti amministratori aggiungendoli al gruppo ‘amministratori’."
+        }
     },
     "items_verbose_items_left": "Ci sono {items} oggetti rimasti. | C’è un {items} rimasto | Ci sono {items} rimasti.",
-    "hook_data_xmpp_desc": "Configurazioni utenti e stanze, upload file",
-    "hook_data_xmpp": "Dati XMPP",
     "hook_conf_manually_modified_files": "Configurazioni modificate manualmente",
     "hook_conf_ynh_settings": "Configurazioni YunoHost",
     "confirm_group_add_access_permission": "Sei sicuro di voler concedere l'accesso {perm} a {name}? Questo accesso aumenta significativamente la superficie di attacco nel caso {name} fosse una persona malevola. Dovresti effettuare quest'azione solo se hai FIDUCIA in questa persona/gruppo.",
     "app_install_parameters": "Parametri installazione",
     "domain": {
-        "config": {
-            "edit": "Modifica la configurazione del dominio",
-            "title": "Configurazione del dominio"
-        },
         "dns": {
             "push": "Invia records DNS al registrar",
             "push_force": "Sovrascivi records esistenti",
-            "push_force_confirm": "Sei sicuro di voler impostare tutti i records dns suggeriti? Sii consapevole che potresti sovrascrivere records predefiniti importanti o impostati manualmente da te o dal tuo registrar.",
+            "push_force_confirm": "Sei sicuro di voler impostare tutti i registri DNS suggeriti? Sii consapevole che potresti sovrascrivere registri predefiniti importanti o impostati manualmente da te o dal tuo registrar.",
             "auto_config": "Configurazione automatica dei records DNS",
             "auto_config_ignored": "ignorato, non verrà cambiato da YunoHost a meno che non selezioni l'opzione di sovrascrittura",
             "auto_config_ok": "La configurazione automatica sembra essere a posto!",
             "auto_config_zone": "Zona DNS corrente",
-            "edit": "Modifica la configurazione DNS",
             "manual_config": "Records DNS suggeriti per la configurazione manuale",
             "info": "La configurazione automatica dei records DNS e una funzione sperimentale. <br>Considera il salvataggio della tua zona DNS corrente dall'interfaccia del tuo registrar DNS prima di impostare records da qui.",
             "push_force_warning": "Sembra che alcuni records DNS che YunoHost avrebbe impostato, sono già presenti nella configurazione del registrar. Puoi usare l'opzione sovrascrivi se sai ciò che stai facendo."
-        }
+        },
+        "info": {
+            "apps_on_domain": "App installate in questo dominio",
+            "dyn_dns_remove_and_unsubscribe": "De-registra inoltre il dominio dal servizio DynDNS di YunoHost",
+            "certificate_authority": "Autorità di certificazione SSL",
+            "registrar": "Registro"
+        },
+        "add": {
+            "dyn_dns_password": "Password per il recupero del dominio",
+            "dyn_dns_password_desc": "Questa password ti permetterà di recuperare il controllo del dominio qualora scegliessi di reinstallare il tuo sistema in un secondo momento. Se hai già registrato questo dominio in precedenza, usa qui la tua password di recupero per riottenerlo.",
+            "from_local": "Voglio un dominio per uso locale/solo test",
+            "from_yunohost_desc": "Il progetto YunoHost mantiene un servizio “DynDNS” gratuito. È limitato a un dominio per server (anche se puoi anche aggiungere sottodomini successivamente, usando l’opzione “Aggiungi un dominio o un sottodominio che possiedo” qui sopra). La configurazione DNS sarà gestita da YunoHost. Quest’opzione è l’ideale per esordire nel self-hosting e se non vuoi investire in un nome dominio per il momento. Tuttavia, nel medio/lungo termine raccomandiamo di acquistare il tuo nome dominio da un registrar, per avere un controllo completo del tuo dominio.",
+            "from_local_desc": "Se non vuoi un “vero” nome di dominio pubblico, puoi usare qualunque cosa che termini con <code>.local</code> o <code>.test</code>. I nomi dominio che terminano con <code>.local</code> sono speciali perché possono essere risolti automaticamente dal network locale, assumendo che i client supportino il protocollo Bonjour. Alternativamente potresti dover modificare il file <code>/etc/hosts</code> (o l’equivalente di Windows) su ogni client da cui desideri utilizzare questo dominio, o dover configurare parametri DNS locali sul tuo router internet.",
+            "from_registrar": "Vorrei aggiungere un dominio che possiedo",
+            "from_registrar_desc": "Dovrai configurare manualmente i registri DNS sul tuo registrar per finalizzare la configurazione di questo dominio. La diagnosi di YunoHost ti guiderà per individuare quali registri DNS devi configurare.",
+            "from_yunohost": "Non possiedo un dominio, voglio registrare/usare un dominio DynDNS gratuito, offerto dal progetto YunoHost",
+            "from_subdomain_desc": "Se il tuo registro DNS configurato lo permette, potrai installare un certificato Let’s Encrypt automaticamente.",
+            "from_subdomain": "Vorrei aggiungere un sottodominio per un dominio già aggiunto"
+        },
+        "toggle_subdomains": "Attiva o disattiva i sottodomini",
+        "types": {
+            "main_domain": "Dominio principale"
+        },
+        "explain": {
+            "main_domain": "Il dominio principale è il dominio da cui gli utenti possono connettersi al portale (via “{domain}/yunohost/sso”).<br>Per questa ragione non è possibile eliminarlo.<br>Se vuoi eliminare “{domain}”, devi prima scegliere o aggiungere un altro dominio come principale."
+        },
+        "cert": {
+            "valid_for": "Valido per {days}",
+            "types": {
+                "selfsigned": "Auto-verificato",
+                "other": "Altro/Sconosciuto",
+                "letsencrypt": "Let’s Encrypt"
+            },
+            "install": "Installa anche un certificato Let’s Encrypt"
+        },
+        "see_parent_domain": "Vedi il dominio genitore"
     },
     "users_import_csv_file_desc": "Il file CSV dovrebbe essere in UTF-8 e con le colonne username, password , gruppi, email e quota. Per avere un esempio di un file CSV da importare, puoi <a href='/yunohost/api/users/export' target='_blank'>esportare i tuoi attuali utenti in un file CSV</a> e modificarlo.",
     "users_import_delete_others": "Elimina utenti non in lista",
@@ -524,10 +415,136 @@
     "users_import_update": "Aggiorna gli utenti esistenti",
     "users_import_delete": "Elimina gli utenti non in lista",
     "users_import_update_desc": "Se spuntato, tutti gli utenti contenuti nel file CSV saranno aggiornati con il nuovo valore",
-    "domain_dns_push_not_applicable": "Il settaggio automatico dei record DNS non è applicabile al dominio {domain},<br>Dovresti configurare i tuoi record DNS seguendo la <a href='https://yunohost.org/dns'>documentazione</a> e la configurazione suggerita qui sotto.",
     "text_selection_is_disabled": "La selezione del testo è disabilitata. Se vuoi condividere questo log, sei pregato di condividere il log *interamente*, tramite il bottone 'condividi con Yunopaste'.<br/><small>Oppure, se vuoi proprio proprio selezionare il testo, premi i tasti: ↓↓↑↑.</small>",
     "users_import_delete_desc": "Se spuntato, tutti gli utenti esistenti che non sono nel file CSV saranno eliminati (e espulsi).",
-    "retry": "Riprova",
     "app_state_broken_explanation": "Questa applicazione è attualmente non funzionante e quindi non installabile secondo i controlli automatici di YunoHost",
-    "confirm_install_app_broken": "ATTENZIONE! Questa applicazione non è funzionante secondo i controlli automatici di YunoHost e quindi potrebbe rovinare il vostro sistema! Probabilmente NON dovreste installarla a meno che non sappiate cosa state facendo. Volete prendervi questo rischio?"
+    "app": {
+        "doc": {
+            "notifications": {
+                "understood": "Ho capito",
+                "post_upgrade": "Note post-aggiornamento",
+                "post_install": "Note post-installazione"
+            },
+            "admin": {
+                "title": "Documentazione admin"
+            }
+        },
+        "antifeatures": "Questa app ha funzionalità che potrebbero non piacerti:",
+        "info": {
+            "forum": "Cerca o domanda sul forum!",
+            "problem": "Un problema con quest'app?",
+            "config_panel_error_please_report": "Per favore, segnala questo errore al team di YunoHost, perché sia risolto!",
+            "config_panel_error": "Un errore impedisce di mostrare il pannello di configurazione:"
+        },
+        "install": {
+            "notifs": {
+                "post": {
+                    "title": "Notifiche successive all'installazione di '{name}'",
+                    "alert": "Sembra che l’installazione abbia funzionato!\nEcco alcune notifiche che la persona che ha creato il pacchetto considera importante conoscere.\nPuoi leggerle di nuovo nella pagina di informazione dell’applicazione."
+                },
+                "pre": {
+                    "warning": "Ciò che occorre sapere prima dell'installazione",
+                    "danger": "L'installazione dell'applicazione determinerà molto probabilmente dei problemi",
+                    "critical": "L'applicazione non può essere installata"
+                }
+            },
+            "problems": {
+                "arch": "Questa applicazione può essere installata solo su architetture specifiche ({required}), ma l'architettura del tuo server è {current}.",
+                "broken": "Questa applicazione è guasta secondo le verifiche automatiche di YunoHost ed è probabile che guasti il tuo sistema! Probabilmente NON dovresti installarla a meno che sappia ciò che stai facendo.",
+                "ignore": "Capisco che questa installazione può guastare il mio sistema, ma voglio provare comunque.",
+                "inprogress": "Questa applicazione è ancora sperimentale (non funziona ancora alla perfezione) ed è probabile che guasti il tuo sistema! Probabilmente NON dovresti installarla a meno che tu non sappia cosa stai facendo.",
+                "install": "È già installato e non può essere installato più di una volta.",
+                "version": "Quest’applicazione richiede YunoHost ≥ {required}, ma la versione attualmente installata è {current}. Considera di aggiornare YunoHost, prima.",
+                "lowquality": "Anche se quest’applicazione funziona, non è ben integrata in YunoHost. Alcune funzionalità, come single sign-on e backup/recupero potrebbero non essere disponibili, oppure l’applicazione potrebbe non rispettare buone pratiche.",
+                "ram": "Quest’applicazione richiede {required} di RAM per l’installazione o l’aggiornamento, ma solo {current} sono disponibili al momento. Anche se l’app può funzionare, il suo processo d’installazione richiede una grande quantità di RAM, perciò il tuo server potrebbe bloccarsi e fallire miseramente.",
+                "thirdparty": "Quest’applicazione non è parte del catalogo ufficiale di YunoHost. Installare applicazioni di terze parti potrebbe compromettere l’integrità e la sicurezza del tuo sistema. NON dovresti installarla se non sei sicurə di ciò che stai facendo."
+            },
+            "try_demo": "Prova la demo",
+            "version": "Versione corrente: {version}"
+        },
+        "open_this_app": "Apri quest’app",
+        "integration": {
+            "ldap": {
+                "true": "Usa gli account YunoHost per l’accesso (LDAP)",
+                "?": "Nessuna informazione riguardo all’integrazione LDAP",
+                "false": "Non usa gli account YunoHost per l’accesso (LDAP)"
+            },
+            "sso": {
+                "true": "Il sign-on singolo è disponibile (SSO)",
+                "?": "Nessuna informazione riguardo all’integrazione SSO",
+                "false": "Il sign-on singolo non è disponibile (SSO)"
+            },
+            "archs": "Architetture supportate:",
+            "multi_instance": {
+                "false": "Può essere installata solo una volta",
+                "true": "Può essere installata più volte"
+            },
+            "resources": "Utilizzo di risorse tipico: {ram} RAM, {disk} disco",
+            "title": "Integrazione con YunoHost"
+        },
+        "links": {
+            "package": "Repository dei pacchetti di YunoHost",
+            "title": "Collegamenti",
+            "userdoc": "Documentazione ufficiale per gli utenti",
+            "website": "Sito web ufficiale",
+            "admindoc": "Documentazione Admin ufficiale",
+            "code": "Repository ufficiale del codice sorgente",
+            "license": "Licenza dell’app",
+            "forum": "Argomenti collegati a quest’app nel forum di YunoHost",
+            "package_license": "Licenza del pacchetto YunoHost"
+        },
+        "upgrade": {
+            "confirm": {
+                "apps": "Applicazioni che saranno aggiornate",
+                "title": "Conferma l’aggiornamento delle app"
+            },
+            "continue": "Continua all’app successiva",
+            "notifs": {
+                "post": {
+                    "title": "Notifiche post-aggiornamento per ‘{name}’",
+                    "alert": "Sembra che l’aggiornamento sia andato bene!\nEcco alcune notifiche che la persona che ha creato il pacchetto considera importanti riguardo a questo aggiornamento.\nPotrai leggerle nuovamente nella pagina di informazioni dell’app."
+                },
+                "pre": {
+                    "alert": "Dovresti controllare queste notifiche prima di aggiornare, potrebbero esserci cose importanti da sapere.",
+                    "title": "Attenzione!"
+                }
+            },
+            "stop": "Annulla i prossimi aggiornamenti di app"
+        },
+        "installed_version": "Versione installata:",
+        "potential_alternative_to": "Potenziale alternativa a:",
+        "uninstall": {
+            "purge_desc": "Rimuovi la directory dei dati associati all’app (solitamente, si tratta di dati che hai caricato tu stessə usando l’app)."
+        },
+        "upvote": "Se vuoi portare più attenzione su quest’applicazione, puoi votarla [nella sua pagina del catalogo](https://apps.yunohost.org/app/{id})."
+    },
+    "wrong_password_or_username": "Password o username sbagliati",
+    "manage_groups": "Gestisci i gruppi",
+    "tools_yunohost_settings": "Impostazioni di YunoHost",
+    "app_state_broken": "rottə",
+    "details_about": "Mostra maggiori dettagli riguardo a {subject}",
+    "group_explain_admins": "Questo è un gruppo speciale, che corrisponde agli utenti amministratori. Gli utenti di questo gruppo possono accedere all’interfaccia di amministrazione web di YunoHost, connettersi al server tramite SSH e usare il comando `sudo`. Inoltre, ricevono le email inviate a root{'@'}, admin{'@'} e admins{'@'}, come le notifiche di diagnosi. Dovresti aggiungere a questo gruppo solo persone di cui ti fidi completamente!",
+    "group_admins": "Amministratori",
+    "important_yunohost_upgrade": "Un importante aggiornamento di YunoHost è importante. È fortemente raccomandato di leggere attentamente le note di rilascio sul forum, prima di aggiornare: <a href='https://forum.yunohost.org/tag/ynh_release'>Visita le note di rilascio sul forum</a>",
+    "label_for_manifestname_help": "Questo è il nome mostrato nel portale dell’utente. Potrà essere cambiato in seguito.",
+    "loading": "Caricamento",
+    "quick_action": "Azione veloce",
+    "tos": {
+        "acknowledgement": "Riconoscimento dei termini di servizio",
+        "i_agree": "Accetto",
+        "i_have_read": "Ho letto e comprendo i <a href='https://yunohost.org/terms_of_services' target='_blank'>termini di servizio</a>",
+        "postinstall_acknowledgement": "Il progetto YunoHost è composto da una squadra di volontari che portano avanti la causa comune di un sistema operativo libero per server, chiamato YunoHost. Il software YunoHost è pubblicato con [la licenza AGPLv3](https://www.gnu.org/licenses/agpl-3.0.txt). In connessione a questo software, il progetto amministra e rende disponibili diversi servizi tecnici e di comunità per varie finalità. Usando questi servizi, accetti di essere soggettə ai seguenti [termini di servizio](https://yunohost.org/terms_of_services)."
+    },
+    "groups": {
+        "remove_user": {
+            "confirm_from_admins": "Sei sicurə di voler rimuovere te stessə dal gruppo “admins”?"
+        }
+    },
+    "install_app": "Installa un’app",
+    "form": {
+        "current_file": "File attuale:",
+        "select_one": "Scegli un’opzione"
+    },
+    "catalog_partial_search": "Prova a rimuovere tutti i criteri per vedere se l’app che stai cercando è disponibile.",
+    "catalog_wishlist": "Sembra che l’app che stai cercando non sia disponibile nel catalogo.\n Puoi proporla nella [lista delle app desiderate](https://apps.yunohost.org/wishlist?search={search}), o votarla se c’è già."
 }

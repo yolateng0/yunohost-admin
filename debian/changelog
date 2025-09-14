@@ -1,3 +1,347 @@
+yunohost-admin (12.1.11) stable; urgency=low
+
+  - tools>disks: fix missing breadcrumbs (2b95b230)
+  - tools>disks: add disclaimer about the fact that this is experimental / under construction + fix message when no disk is found (ca77b0b0)
+  - i18n: Translations updated for Chinese (Simplified), Portuguese (Brazil), Spanish
+
+  Thanks to all contributors <3 ! (ako, Lucas Freitas, Poesty Li)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 31 Aug 2025 23:26:04 +0200
+
+yunohost-admin (12.1.10) stable; urgency=low
+
+  - Require Yunohost >= 12.1 (534ffa0c)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 24 Aug 2025 18:39:09 +0200
+
+yunohost-admin (12.1.9) stable; urgency=low
+
+  - fix breadcrumb for group/permissions view now that it's in the home page (4e8a188f)
+  - Release as stable !
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 20 Aug 2025 01:38:38 +0200
+
+yunohost-admin (12.1.8) testing; urgency=low
+
+  - fix: CardForm missing slot 'buttons' (6ea89b55)
+  - fix: show error modal on global catch (775af76f)
+  - fix: Firewall port table slight misalignment (4a0dc899)
+  - feat: add new ModalPreconditionError to display not catched 400 errors (5ddf09bc)
+  - i18n: Translations updated for Basque, French, Galician, Polish, Russian
+
+  Thanks to all contributors <3 ! (Axolotle, José M, ppr, Przemysław Samul, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 11 Aug 2025 00:34:39 +0200
+
+yunohost-admin (12.1.7) testing; urgency=low
+
+  - Point donation link to the website ([#639](http://github.com/YunoHost/yunohost-admin/pull/639))
+  - Rework 'operations' part in app info page + improve the UI/UX for app and system packages upgrade ([#640](http://github.com/YunoHost/yunohost-admin/pull/640))
+  - i18n: Translations updated for Esperanto, French, Galician, German, Japanese, Kabyle, Portuguese (Brazil), Spanish
+
+  Thanks to all contributors <3 ! (ButterflyOfFire, Caio Carrara, daisuke, José M, Mélanie Chauvel, ppr, rosbeef andino, Thomas Weiss, tituspijean)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 04 Aug 2025 17:33:45 +0200
+
+yunohost-admin (12.1.6) testing; urgency=low
+
+  - chore: bump vite from 6.0.15 to 6.1.6 in /app ([#637](http://github.com/YunoHost/yunohost-admin/pull/637))
+  - i18n: Translations updated for Dutch, French, German, Kabyle, Polish
+
+  Thanks to all contributors <3 ! (Amir, Boudewijn, ButterflyOfFire, harc, Matthias Roy, ppr, Rachida)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 18 May 2025 18:57:24 +0200
+
+yunohost-admin (12.1.5) testing; urgency=low
+
+  - Add storage management section + disks management page ([#585](http://github.com/YunoHost/yunohost-admin/pull/585))
+  - i18n: Translations updated for Basque, Czech, French, Galician, German, Spanish
+
+  Thanks to all contributors <3 ! (Alonso Roco, Apfel, Christophe Henry, demodé, José M, ppr, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sat, 19 Apr 2025 17:52:27 +0200
+
+yunohost-admin (12.1.4) testing; urgency=low
+
+  - apps: add logo placeholder so that text remains aligned in the grid ([#629](http://github.com/YunoHost/yunohost-admin/pull/629))
+  - Fix broken spinner /o\ (17f2f69a)
+  - ci: add autolintfix (cdd7ab4a)
+  - chore: bump vite from 6.0.9 to 6.0.12 in /app ([#630](http://github.com/YunoHost/yunohost-admin/pull/630))
+
+  Thanks to all contributors <3 ! (oleole39)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 31 Mar 2025 01:17:17 +0200
+
+yunohost-admin (12.1.3) testing; urgency=low
+
+  - Smartphone shortcut icon and add better quality favicon ([#627](http://github.com/YunoHost/yunohost-admin/pull/627))
+
+  Thanks to all contributors <3 ! (OniriCorpe)
+
+ -- tituspijean <tituspijean@yunohost.org>  Sun, 23 Mar 2025 10:21:07 +0100
+
+yunohost-admin (12.1.2) testing; urgency=low
+
+  - login: autofocus the username field on page load ([#626](http://github.com/YunoHost/yunohost-admin/pull/626))
+  - Easteregg spinner for trans day? ([#625](http://github.com/YunoHost/yunohost-admin/pull/625))
+  - [i18n] Translations updated for French, French) ([#624](http://github.com/YunoHost/yunohost-admin/pull/624))
+
+  Thanks to all contributors <3 ! (Alexandre Aubin, OniriCorpe, Tagada, Éric Gaspar)
+
+ -- tituspijean <tituspijean@yunohost.org>  Sun, 16 Mar 2025 11:58:20 +0100
+
+yunohost-admin (12.1.1) testing; urgency=low
+
+  - Cleanups (75b924d5, 3b1246ba, 3b15c3cf)
+  - Move group/perms link to home directly ([#609](http://github.com/YunoHost/yunohost-admin/pull/609))
+  - Add `debug` option to log sse msg ([#622](http://github.com/YunoHost/yunohost-admin/pull/622))
+  - i18n: Translations updated (most of it because of previous cleanup of unused strings) for Arabic, Basque, Catalan, Chinese (Simplified), Czech, Dutch, Finnish, French, Galician, German, Indonesian, Italian, Japanese, Occitan, Persian, Polish, Portuguese, Russian, Slovak, Slovenian, Spanish, Turkish, Ukrainian
+
+  Thanks to all contributors <3 ! (Anonymous, axolotle, Éric Gaspar, José M, ppr, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 05 Mar 2025 18:13:55 +0100
+
+yunohost-admin (12.1.0) testing; urgency=low
+
+  - New "SSE" API to streaming/broadcasting logs of the current action ([#603](http://github.com/YunoHost/yunohost-admin/pull/603))
+  - Adapt webadmin to the new firewall API ([#606](http://github.com/YunoHost/yunohost-admin/pull/606))
+  - New 'app core' config panel allowing to change the app logo, label, etc., as well as trigger app upgrade, change url, uninstall ([#615](http://github.com/YunoHost/yunohost-admin/pull/615))
+  - naming: simplifying the "user portal" naming to just "portal" (3d907a08)
+  - i18n: add script to check for unused/undefined i18n string + cleanup ([#620](https://github.com/YunoHost/yunohost-admin/pull/620))
+  - i18n: Translations updated for Basque, Chinese (Simplified), French, Galician, German, Italian, Turkish
+
+  Thanks to all contributors <3 ! (axolotle, Éric Gaspar, Félix Piédallu, Furkan Samed Acet, José M, OniriCorpe, Poesty Li, ppr, Tommi, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 23 Feb 2025 21:36:17 +0100
+
+yunohost-admin (12.0.5) stable; urgency=low
+
+  - maintenance: general maintenance, update deps ([#601](http://github.com/YunoHost/yunohost-admin/pull/601),
+  [#602](http://github.com/YunoHost/yunohost-admin/pull/602),
+  [#607](http://github.com/YunoHost/yunohost-admin/pull/607), [#608](http://github.com/YunoHost/yunohost-admin/pull/608))
+  - postinstall: set as installed after postinstall (46d457ce)
+  - postinstall: properly hide subdomain choice in DomainForm (260577ed)
+  - apps: fix blank page when app may not have 'main' permission (d4859039)
+  - i18n: Translations updated for Basque, Catalan, Chinese (Simplified), French, German, Occitan, Spanish
+
+  Thanks to all contributors <3 ! (axolotle, Francescc, Joe Lillibridge, Poesty Li, ppr, Quentí, rosbeef andino, Vinzenz Vietzke, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 20 Jan 2025 15:20:21 +0100
+
+yunohost-admin (12.0.4) stable; urgency=low
+
+  - Rework 'quick add' menu to improve item naming consistency (c4b534ce)
+  - Fix change_url not working ([#596](http://github.com/YunoHost/yunohost-admin/pull/596))
+  - Fix adding new group not working ([#596](http://github.com/YunoHost/yunohost-admin/pull/596))
+  - Fix other buttons not working ([#596](http://github.com/YunoHost/yunohost-admin/pull/596))
+  - forms: disable autocapitalize for usernames & spellcheck for username… ([#597](http://github.com/YunoHost/yunohost-admin/pull/597))
+  - i18n: Translations updated for Basque, Chinese (Simplified), Danish, English, French, Galician, Hindi, Hungarian, Italian, Turkish
+
+  Thanks to all contributors <3 ! (Andreas Gammelgaard Damsbo, Atalay Daban, axolotle, Edward A, Éric Gaspar, José M, Norbi Peti, OniriCorpe, Poesty Li, puffious, tituspijean, Tommi, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 27 Nov 2024 12:00:17 +0100
+
+yunohost-admin (12.0.3.5) stable; urgency=low
+
+  - Stable release for YunoHost 12
+
+  Thanks to all contributors <3 !
+
+ -- tituspijean <titus+yunohost@pijean.ovh>  Wed, 30 Oct 2024 21:53:57 +0100
+
+yunohost-admin (12.0.3.4) testing; urgency=low
+
+  - Merge bullseye changes
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 30 Oct 2024 03:05:25 +0100
+
+yunohost-admin (12.0.3.2) testing; urgency=low
+
+  - fix: file form value (40c0d829)
+  - fix(FileItem): no longer possible to have custom labels, display filename above if defined (86091e53)
+  - fix(ConfigPanels): submit button not appearing on tab change (be55f7f9)
+  - fix(TagsSelectizeItem): add default i18n item name (34ee7df6)
+  - ts: misc fixes (ee2a54a6)
+  - fix(SelectItem): wrong select i18n key (16205e5a)
+  - fix(AppInfo): missing operations tab when no config panels (66e4bfd7)
+  - fix(ToolLog): display more logs button (512efa9c)
+
+  Thanks to all contributors <3 ! (axolotle)
+
+ -- tituspijean <tituspijean@yunohost.org>  Mon, 28 Oct 2024 21:48:46 +0100
+
+yunohost-admin (12.0.3.1) testing; urgency=low
+
+  - fix: blank 'domains' page / v-b-tooltip doesn't work on build, use Popover component instead (6dde7f1b)
+  - fix: FormField links (0cf55c5b)
+
+  Thanks to all contributors <3 ! (axolotle)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 25 Sep 2024 20:57:31 +0200
+
+yunohost-admin (12.0.3) testing; urgency=low
+
+  - Epic refactoring to Vue3 and typescript ([#575](http://github.com/YunoHost/yunohost-admin/pull/575))
+  - domain/apps: improve the flow of adding a subdomain during app install: the 'domain add' view now shows an explicit option for subdomains, with the ability to auto-attempt lets encrypt cert, and be able to add such a subdomain from a modal during app install ([#579](http://github.com/YunoHost/yunohost-admin/pull/579))
+  - permissions: Ask for confirmation when trying to self-remove from the admin group ([#582](http://github.com/YunoHost/yunohost-admin/pull/582))
+  - apps: during install, display antifeature details when they are provided by the app ([#582](http://github.com/YunoHost/yunohost-admin/pull/582))
+  - apps: mention the wishlist/vote system in catalog ([#583](http://github.com/YunoHost/yunohost-admin/pull/583))
+  - general: add TOS links and acknowledgement during postinstall, dyndns registration ([#580](http://github.com/YunoHost/yunohost-admin/pull/580))
+  - dns: Make auto dns feature optional ([#581](http://github.com/YunoHost/yunohost-admin/pull/581))
+  - chore: Update JS dependencies ([#584](http://github.com/YunoHost/yunohost-admin/pull/584))
+  - i18n: fix a few strings that were only partially translatable ([#582](http://github.com/YunoHost/yunohost-admin/pull/582))
+  - i18n: remove count info in `items` (6ef1d11b)
+
+  Thanks to all contributors <3 ! (axolotle)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 16 Sep 2024 18:25:57 +0200
+
+yunohost-admin (12.0.2) testing; urgency=low
+
+  - config panels: fix panel help message not being displayed (7859b221)
+
+  Thanks to all contributors <3 ! (axolotle)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sat, 31 Aug 2024 20:09:29 +0200
+
+yunohost-admin (12.0.1) testing; urgency=low
+
+  - Reflect change in the core about pydantic/config panels (06bb22f4, 60934cf7)
+  - No need anymore to the server after yunohost upgrades because the session should still be valid (1d892350)
+  - i18n: Translations updated for Basque, Chinese (Simplified), Danish, Dutch, French, Galician, German, Indonesian, Italian, Polish, Russian, Slovak, Spanish
+
+  Thanks to all contributors <3 ! (Andreas Gammelgaard Damsbo, axolotle, Boudewijn, bruno van den bosch, cjdw, Émile, Ivan Davydov, José M, Jose Riha, Kuba Bazan, Øjvind Fritjof Arnfred, OniriCorpe, Poesty Li, rosbeef andino, Tagadda, Titus PiJean, Tommi, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 26 Jul 2024 22:30:32 +0200
+
+yunohost (12.0.0) unstable; urgency=low
+
+  - Tmp changelog to prepare Bookworm
+
+ -- Tagada <tagada@cant.at>  Fri, 12 May 2023 16:20:28 +0000
+ 
+yunohost-admin (11.3.0) stable; urgency=low
+
+  - Bump version for 11.3 release
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 31 Oct 2024 13:57:52 +0100
+
+yunohost-admin (11.2.9) stable; urgency=low
+
+  - migration view: render the disclaimer as markdown (8bc97ae7)
+  - i18n: Translations updated for Basque, Dutch, English, French, Galician, German, Indonesian, Turkish
+
+  Thanks to all contributors <3 ! (Atalay Daban, Chloe, cjdw, Edward A, Éric Gaspar, Furkan Samed Acet, José M, Mer, ppr, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Tue, 29 Oct 2024 23:56:24 +0100
+
+yunohost-admin (11.2.8) stable; urgency=low
+
+  - [i18n] Translations updated for Basque, Galician, Greek, Indonesian, Polish, Russian, Slovak, Turkish
+
+  Thanks to all contributors <3 ! (Ali Çırçır, cjdw, craftrac, Grzegorz Cichocki, Ivan Davydov, José M, Jose Riha, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 25 Aug 2024 13:25:17 +0200
+
+yunohost-admin (11.2.7) stable; urgency=low
+
+  - Disable sending referer when clicking on links to external websites ([#573](http://github.com/YunoHost/yunohost-admin/pull/573))
+  - i18n: Translations updated for Basque, Danish, Indonesian, Polish, Russian, Slovak
+
+  Thanks to all contributors <3 ! (Andreas Gammelgaard Damsbo, cjdw, Ivan Davydov, Jose Riha, Kuba Bazan, OniriCorpe, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 15 Jul 2024 16:34:10 +0200
+
+yunohost-admin (11.2.6) stable; urgency=low
+
+  - fix: config panel "tags" turned into "select" (5a805463)
+  - [i18n] Translations updated for Danish, Dutch, French
+
+  Thanks to all contributors <3 ! (Alexandre Aubin, Andreas Gammelgaard Damsbo, axolotle, bruno van den bosch, Øjvind Fritjof Arnfred, Titus PiJean)
+
+ -- OniriCorpe <oniricorpe@yunohost.org>  Mon, 20 May 2024 00:09:45 +0200
+
+yunohost-admin (11.2.5) stable; urgency=low
+
+  - maintenance: Pre vue3 changes ([#555](https://github.com/yunohost/yunohost-admin/pull/555))
+  - maintenance: prettier + yarn to match yunohost-portal stack ([#553](https://github.com/yunohost/yunohost-admin/pull/553))
+  - maintenance: update actions/checkout@v3 to v4 ([#546](https://github.com/yunohost/yunohost-admin/pull/546))
+  - misc: technical fixes ([#552](https://github.com/yunohost/yunohost-admin/pull/552), [#563](https://github.com/yunohost/yunohost-admin/pull/563), 791a9fe9)
+  - readme: add pictures alt text and some markdown standardization ([#558](https://github.com/yunohost/yunohost-admin/pull/558))
+  - logs: fix the arrow key trick to enable text selection (e1b26301)
+  - users: allow plus on email ([#564](https://github.com/yunohost/yunohost-admin/pull/564))
+  - apps: add package license link in AppInfo + AppInstall ([#550](https://github.com/yunohost/yunohost-admin/pull/550), [#545](https://github.com/yunohost/yunohost-admin/pull/545))
+  - i18n: Translations updated for Arabic, Basque, Bengali (Bangladesh), Catalan, Chinese (Simplified), Czech, Dutch, English, Esperanto, Finnish, French, Galician, German, Indonesian, Italian, Japanese, Korean, Lithuanian, Macedonian, Occitan, Persian, Polish, Portuguese, Portuguese (Brazil), Russian, Slovak, Slovenian, Spanish, Swedish, Telugu, Turkish, Ukrainian
+
+  Thanks to all contributors <3 ! (axolotle, Boudewijn, Bram, Christian Wehrli, Émile, Francescc, Gregor, Jan-Willem Swane, José M, OniriCorpe, Poesty Li, ppr, Tagada, Tommi, xabirequejo, xaloc33)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 11 Apr 2024 14:05:33 +0200
+
+yunohost-admin (11.2.4.1) stable; urgency=low
+
+  - [i18n] Translations updated for Arabic, Basque, Catalan, Chinese (Simplified), English, French, Galician, German, Italian, Kabyle, Korean, Occitan, Spanish, Ukrainian
+
+  Thanks to all contributors <3 ! (Alexandre Aubin, ButterflyOfFire, Carlos Solís, Christian Wehrli, cube, Emanuele Gissi, Éric Gaspar, Francescc, José M, Lasse Gismo, Mine_My, OniriCorpe, Poesty Li, Quentí, Tommi, xabirequejo)
+
+ -- Tagada <36127788+Tagadda@users.noreply.github.com>  Wed, 21 Feb 2024 00:12:32 +0100
+
+yunohost-admin (11.2.4) stable; urgency=low
+
+  - users: Allow dots in usernames ([#539](https://github.com/yunohost/yunohost-admin/pull/539))
+  - dyndns/domainadd : fix message still pointing to the old thread when a dyndns domain is registered, provide a more comprehensive explanation about the situation (71ea6c43)
+  - chore: update actions version to use node 16 version ([#536](https://github.com/yunohost/yunohost-admin/pull/536))
+  - Disable safari automatic zoom on input field ([#537](https://github.com/yunohost/yunohost-admin/pull/537))
+  - i18n: Translations updated for Basque, French, Galician, German, Polish, Slovak, Spanish
+
+  Thanks to all contributors <3 ! (Christian Wehrli, Jorge-vitrubio.net, José M, Jose Riha, Kuba Bazan, Metin Bektas, OniriCorpe, ppr, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 27 Dec 2023 19:15:37 +0100
+
+yunohost-admin (11.2.3) stable; urgency=low
+
+  - apps: Add link to the package repository in the info page ([#531](https://github.com/yunohost/yunohost-admin/pull/531))
+  - apps: add --purge option in app uninstall modal ([#532](https://github.com/yunohost/yunohost-admin/pull/532))
+  - dyndns/domain: Handle dyndns recovery password, rework a bit the domain add page ([#529](https://github.com/yunohost/yunohost-admin/pull/529))
+  - i18n: Translations updated for Arabic, Czech, French, Galician, Indonesian, Occitan, Slovak
+
+  Thanks to all contributors <3 ! (Albion Severin, axolotle, ButterflyOfFire, José M, Jose Riha, Neko Nekowazarashi, ppr, Quentí, Tagada)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 09 Oct 2023 23:20:32 +0200
+
+yunohost-admin (11.2.2) stable; urgency=low
+
+  - [i18n] Translations updated for Arabic, Polish, Spanish
+
+  Thanks to all contributors <3 ! (ButterflyOfFire, Kuba Bazan, taco)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 31 Aug 2023 17:34:09 +0200
+
+yunohost-admin (11.2.1) stable; urgency=low
+
+  - args: reflect pydantic change of `name` to `id` (1fe4320b)
+
+  Thanks to all contributors <3 ! (axolotle)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 17 Jul 2023 20:52:22 +0200
+
+yunohost-admin (11.2) stable; urgency=low
+
+  - login: set password min length to 4 to try to fix the demo admin not being accessible .. (946c3e61)
+  - i18n: Translations updated for Basque, Galician, German, Japanese, Polish
+
+  Thanks to all contributors <3 ! (Christian Wehrli, Grzegorz Cichocki, José M, motcha, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 17 Jul 2023 16:29:38 +0200
+
+yunohost-admin (11.1.10) stable; urgency=low
+
+  - apps: Funky 'dismiss' button for app notification ... let's go for 'understood' instead ... (a3558f54)
+  - i18n: Translations updated for Basque, French, Galician, Indonesian, Occitan, Polish, Russian, Slovak, Ukrainian
+
+  Thanks to all contributors <3 ! (Grzegorz Cichocki, Ilya, José M, Jose Riha, Neko Nekowazarashi, ppr, Quentí, Tymofii-Lytvynenko, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 11 Jun 2023 19:43:52 +0200
+
 yunohost-admin (11.1.9.4) stable; urgency=low
 
   - debian: remove npm from build-depends because it's part of nodejs installed from nodesource... (b619cc5a)

@@ -1,24 +1,66 @@
-<template>
-  <b-select
-    :value="value"
-    :id="id"
-    :options="choices"
-    :required="required"
-    v-on="$listeners"
-    @blur.native="$emit('blur', value)"
-  />
-</template>
+<script setup lang="ts">
+import { computed, inject } from 'vue'
 
-<script>
-export default {
-  name: 'SelectItem',
+import { ValidationTouchSymbol } from '@/composables/form'
+import type { BaseItemComputedProps, SelectItemProps } from '@/types/form'
 
-  props: {
-    value: { type: [String, null], default: null },
-    id: { type: String, default: null },
-    choices: { type: [Array, Object], required: true },
-    required: { type: Boolean, default: false },
-    name: { type: String, default: null }
-  }
-}
+const props = withDefaults(
+  defineProps<SelectItemProps & BaseItemComputedProps>(),
+  {
+    id: undefined,
+    name: undefined,
+    placeholder: undefined,
+    touchKey: undefined,
+    disabled: false,
+
+    ariaDescribedby: undefined,
+    modelValue: undefined,
+    state: undefined,
+    validation: undefined,
+  },
+)
+
+defineEmits<{
+  'update:modelValue': [value: string | null]
+}>()
+
+const model = defineModel<string | number | null>({
+  set: (value) => {
+    if (value === 'null') {
+      return null
+    }
+    return value
+  },
+})
+
+const isOptionalSelectOption = computed(() => {
+  // FIXME `None` handling for config panels is a bit weird
+  return props.choices?.some(
+    (choice) => typeof choice !== 'string' && choice.value === '_none',
+  )
+})
+
+const touch = inject(ValidationTouchSymbol)
+
+const required = computed(() => 'required' in (props?.validation ?? {}))
 </script>
+
+<template>
+  <BFormSelect
+    :id="id"
+    v-model="model"
+    :name="name"
+    :options="choices"
+    :aria-describedby="ariaDescribedby"
+    :state="state"
+    :required="required"
+    :disabled="disabled"
+    @blur="touch?.(touchKey)"
+  >
+    <template v-if="!isOptionalSelectOption" #first>
+      <BFormSelectOption value="null" :disabled="required">
+        -- {{ required ? $t('form.select_one') : $t('words.none') }} --
+      </BFormSelectOption>
+    </template>
+  </BFormSelect>
+</template>

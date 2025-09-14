@@ -1,48 +1,60 @@
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+import api from '@/api'
+import { useAutoModal } from '@/composables/useAutoModal'
+import { useSSE } from '@/composables/useSSE'
+
+const { t } = useI18n()
+const modalConfirm = useAutoModal()
+const { tryToReconnect } = useSSE()
+
+async function triggerAction(action: 'reboot' | 'shutdown') {
+  /*
+  i18n: confirm_reboot_action_reboot
+  i18n: confirm_reboot_action_shutdown
+  */
+  const confirmed = await modalConfirm(t('confirm_reboot_action_' + action))
+  if (!confirmed) return
+
+  api.put({ uri: action + '?force' }).then(() => {
+    const delay = action === 'reboot' ? 4000 : 10000
+    tryToReconnect({ origin: action, delay })
+  })
+}
+</script>
+
 <template>
-  <card :title="$t('operations')" icon="wrench">
+  <YCard :title="$t('operations')" icon="wrench">
     <!-- REBOOT -->
-    <b-form-group
-      label-cols="5" label-cols-md="4" label-cols-lg="3"
-      :label="$t('tools_reboot')" label-for="reboot"
+    <BFormGroup
+      label-cols="5"
+      label-cols-md="4"
+      label-cols-lg="3"
+      :label="$t('tools_reboot')"
+      label-for="reboot"
     >
-      <b-button @click="triggerAction('reboot')" variant="danger" id="reboot">
-        <icon iname="refresh" /> {{ $t('tools_reboot_btn') }}
-      </b-button>
-    </b-form-group>
-    <hr>
+      <BButton id="reboot" variant="danger" @click="triggerAction('reboot')">
+        <YIcon iname="refresh" /> {{ $t('tools_reboot_btn') }}
+      </BButton>
+    </BFormGroup>
+    <hr />
 
     <!-- SHUTDOWN -->
-    <b-form-group
-      label-cols="5" label-cols-md="4" label-cols-lg="3"
-      :label="$t('tools_shutdown')" label-for="shutdown"
+    <BFormGroup
+      label-cols="5"
+      label-cols-md="4"
+      label-cols-lg="3"
+      :label="$t('tools_shutdown')"
+      label-for="shutdown"
     >
-      <b-button @click="triggerAction('shutdown')" variant="danger" id="shutdown">
-        <icon iname="power-off" /> {{ $t('tools_shutdown_btn') }}
-      </b-button>
-    </b-form-group>
-  </card>
+      <BButton
+        id="shutdown"
+        variant="danger"
+        @click="triggerAction('shutdown')"
+      >
+        <YIcon iname="power-off" /> {{ $t('tools_shutdown_btn') }}
+      </BButton>
+    </BFormGroup>
+  </YCard>
 </template>
-
-<script>
-import api from '@/api'
-
-
-export default {
-  name: 'ToolPower',
-
-  methods: {
-    async triggerAction (action) {
-      const confirmed = await this.$askConfirmation(
-        this.$i18n.t('confirm_reboot_action_' + action)
-      )
-      if (!confirmed) return
-
-      this.action = action
-      api.put(action + '?force', {}, action).then(() => {
-        const delay = action === 'reboot' ? 4000 : 10000
-        this.$store.dispatch('TRY_TO_RECONNECT', { attemps: Infinity, origin: action, delay })
-      })
-    }
-  }
- }
-</script>

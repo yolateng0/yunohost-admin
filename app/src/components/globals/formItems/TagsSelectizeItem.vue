@@ -1,156 +1,230 @@
+<script setup lang="ts">
+import type { BDropdown, BFormInput } from 'bootstrap-vue-next'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+import { fromEntries } from '@/helpers/commons'
+import type {
+  BaseItemComputedProps,
+  Choice,
+  TagUpdateArgs,
+  TagsSelectizeItemProps,
+} from '@/types/form'
+
+defineOptions({
+  inheritAttrs: false,
+})
+
+const props = withDefaults(
+  defineProps<TagsSelectizeItemProps & BaseItemComputedProps>(),
+  {
+    id: undefined,
+    name: undefined,
+    placeholder: undefined,
+    touchKey: undefined,
+    disabled: false,
+    auto: false,
+    disabledItems: undefined,
+    itemsName: 'items',
+    label: undefined,
+    limit: undefined,
+    noTags: false,
+    tagIcon: undefined,
+
+    ariaDescribedby: undefined,
+    state: undefined,
+    validation: undefined,
+  },
+)
+
+const emit = defineEmits<{
+  'tag-update': [value: TagUpdateArgs]
+}>()
+
+const modelValue = defineModel<string[]>()
+
+const searchElem = ref<InstanceType<typeof BDropdown> | null>(null)
+const dropdownElem = ref<InstanceType<typeof BFormInput> | null>(null)
+
+const { t } = useI18n()
+
+const search = ref('')
+const criteria = computed(() => {
+  return search.value.trim().toLowerCase()
+})
+const availableOptions = computed(() => {
+  return props.options.filter((opt) => {
+    const tag = typeof opt === 'string' ? opt : opt.value
+    let filterIn =
+      modelValue.value?.indexOf(tag) === -1 &&
+      !(props.disabledItems?.includes(tag) ?? false)
+    if (filterIn && criteria.value) {
+      filterIn = tag.toLowerCase().indexOf(criteria.value) > -1
+    }
+    return filterIn
+  })
+})
+const texts = computed(() =>
+  fromEntries(
+    props.options.map((opt) => {
+      const tag = typeof opt === 'string' ? opt : opt.value
+      const text = typeof opt === 'string' ? opt : opt.text
+      return [tag, text]
+    }),
+  ),
+)
+const searchI18n = computed(() => {
+  const params = { items: t('items.' + props.itemsName, 0) }
+  return {
+    label: t('search.for', { items: t('items.' + props.itemsName, 2) }),
+    invalidFeedback: t('search.not_found', params, 0),
+    noItems: t('items_verbose_items_left', params, 0),
+  }
+})
+const searchState = computed(() => {
+  return criteria.value && availableOptions.value.length === 0 ? false : null
+})
+
+function onAddTag(option: Choice, applyFn: TagUpdateArgs['applyFn']) {
+  const tag = typeof option === 'string' ? option : option.value
+  emit('tag-update', { action: 'add', tag, applyFn })
+  search.value = ''
+  if (props.auto) {
+    applyFn(tag)
+  }
+}
+
+function onRemoveTag(option: Choice, applyFn: TagUpdateArgs['applyFn']) {
+  const tag = typeof option === 'string' ? option : option.value
+  emit('tag-update', { action: 'remove', tag, applyFn })
+  if (props.auto) {
+    applyFn(tag)
+  }
+}
+
+function onDropdownKeydown(e: KeyboardEvent) {
+  // Allow to start searching after dropdown opening
+  // FIXME check if dropdownElem.value!.firstElementChild works (removed the $el)
+  if (
+    !['Tab', 'Space'].includes(e.code) &&
+    e.target === dropdownElem.value!.$el.firstElementChild
+  ) {
+    searchElem.value!.$el.focus()
+  }
+}
+
+// FIXME call touch somewhere?
+</script>
+
 <template>
   <div class="tags-selectize">
-    <b-form-tags
-      v-bind="$attrs" v-on="$listeners"
-      :value="value" :id="id"
-      size="lg" class="p-0 border-0" no-outer-focus
+    <BFormTags
+      v-bind="$attrs"
+      :id="id"
+      v-model="modelValue"
+      :name="name"
+      :aria-describedby="ariaDescribedby"
+      :state="state"
+      :disabled="disabled"
+      no-outer-focus
+      separator=" ,"
+      size="lg"
+      class="p-0 border-0"
     >
       <template #default="{ tags, disabled, addTag, removeTag }">
-        <ul v-if="!noTags && tags.length > 0" class="list-inline d-inline-block mb-2">
-          <li v-for="tag in tags" :key="id + '-' + tag" class="list-inline-item">
-            <b-form-tag
-              @remove="onRemoveTag({ option: tag, removeTag })"
+        <ul
+          v-if="!noTags && tags.length > 0"
+          class="list-inline d-inline-block mb-2"
+        >
+          <li
+            v-for="tag in tags"
+            :key="id + '-' + tag"
+            class="list-inline-item"
+          >
+            <BFormTag
               :title="tag"
-              :disabled="disabled || disabledItems.includes(tag)"
+              :disabled="disabled || (disabledItems?.includes(tag) ?? false)"
               class="border border-dark mb-2"
+              @remove="onRemoveTag(tag, removeTag)"
             >
-              <icon v-if="tagIcon" :iname="tagIcon" /> {{ tag }}
-            </b-form-tag>
+              <YIcon v-if="tagIcon" :iname="tagIcon" /> {{ texts[tag] }}
+            </BFormTag>
           </li>
         </ul>
 
-        <b-dropdown
-          ref="dropdown"
-          variant="outline-dark" block menu-class="w-100"
-          @keydown.native="onDropdownKeydown"
+        <BDropdown
+          ref="dropdownElem"
+          :disabled="disabled"
+          variant="outline-dark"
+          block
+          menu-class="w-100"
+          @keydown="onDropdownKeydown"
         >
           <template #button-content>
-            <icon iname="search-plus" /> {{ label }}
+            <YIcon iname="search-plus" /> {{ label }}
           </template>
 
-          <b-dropdown-group class="search-group">
-            <b-dropdown-form @submit.stop.prevent="() => {}">
-              <b-form-group
-                :label="$t('search.for', { items: itemsName })"
-                label-cols-md="auto" label-size="sm" :label-for="id + '-search-input'"
-                :invalid-feedback="$tc('search.not_found', 0, { items: $tc('items.' + itemsName, 0) })"
-                :state="searchState" :disabled="disabled"
+          <BDropdownGroup class="search-group">
+            <BDropdownForm @submit.stop.prevent="() => {}">
+              <BFormGroup
+                :label="searchI18n.label"
+                :label-for="id + '-search-input'"
+                label-cols-md="auto"
+                label-size="sm"
+                :invalid-feedback="searchI18n.invalidFeedback"
+                :state="searchState"
+                :disabled="disabled"
                 class="mb-0"
               >
-                <b-form-input
-                  ref="search-input" v-model="search"
+                <BFormInput
                   :id="id + '-search-input'"
-                  type="search" size="sm" autocomplete="off"
+                  ref="searchElem"
+                  v-model="search"
+                  autocomplete="off"
+                  size="sm"
+                  type="search"
+                  @click.stop
                 />
-              </b-form-group>
-            </b-dropdown-form>
-            <b-dropdown-divider />
-          </b-dropdown-group>
+              </BFormGroup>
+            </BDropdownForm>
+            <BDropdownDivider />
+          </BDropdownGroup>
 
-          <b-dropdown-item-button
-            v-for="option in availableOptions"
-            :key="option"
-            @click="onAddTag({ option, addTag })"
+          <BDropdownItemButton
+            v-for="(option, i) in availableOptions"
+            :key="i"
+            @click="onAddTag(option, addTag)"
           >
-            {{ option }}
-          </b-dropdown-item-button>
-          <b-dropdown-text v-if="!criteria && availableOptions.length === 0">
-            <icon iname="exclamation-triangle" />
-            {{ $tc('items_verbose_items_left', 0, { items: $tc('items.' + itemsName, 0) }) }}
-          </b-dropdown-text>
-        </b-dropdown>
+            {{ typeof option === 'string' ? option : option.text }}
+          </BDropdownItemButton>
+          <BDropdownText v-if="!criteria && availableOptions.length === 0">
+            <YIcon iname="exclamation-triangle" />
+            {{ searchI18n.noItems }}
+          </BDropdownText>
+        </BDropdown>
       </template>
-    </b-form-tags>
+    </BFormTags>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'TagsSelectizeItem',
-
-  props: {
-    value: { type: Array, required: true },
-    options: { type: Array, required: true },
-    id: { type: String, required: true },
-    placeholder: { type: String, default: null },
-    limit: { type: Number, default: null },
-    name: { type: String, default: null },
-    itemsName: { type: String, required: true },
-    disabledItems: { type: Array, default: () => ([]) },
-    // By default `addTag` and `removeTag` have to be executed manually by listening to 'tag-update'.
-    auto: { type: Boolean, default: false },
-    noTags: { type: Boolean, default: false },
-    label: { type: String, default: null },
-    tagIcon: { type: String, default: null }
-  },
-
-  data () {
-    return {
-      search: ''
-    }
-  },
-
-  computed: {
-    criteria () {
-      return this.search.trim().toLowerCase()
-    },
-
-    availableOptions () {
-      const criteria = this.criteria
-      const options = this.options.filter(opt => {
-        return this.value.indexOf(opt) === -1 && !this.disabledItems.includes(opt)
-      })
-      if (criteria) {
-        return options.filter(opt => opt.toLowerCase().indexOf(criteria) > -1)
-      }
-      return options
-    },
-
-    searchState () {
-      return this.criteria && this.availableOptions.length === 0 ? false : null
-    }
-  },
-
-  methods: {
-    onAddTag ({ option, addTag }) {
-      this.$emit('tag-update', { action: 'add', option, applyMethod: addTag })
-      this.search = ''
-      if (this.auto) {
-        addTag(option)
-      }
-    },
-
-    onRemoveTag ({ option, removeTag }) {
-      this.$emit('tag-update', { action: 'remove', option, applyMethod: removeTag })
-      if (this.auto) {
-        removeTag(option)
-      }
-    },
-
-    onDropdownKeydown (e) {
-      // Allow to start searching after dropdown opening
-      if (
-        !['Tab', 'Space'].includes(e.code) &&
-        e.target === this.$refs.dropdown.$el.lastElementChild
-      ) {
-        this.$refs['search-input'].focus()
-      }
-    }
-  }
-}
-</script>
-
 <style lang="scss" scoped>
-::v-deep .dropdown-menu {
+:deep(.dropdown-menu) {
   max-height: 300px;
   overflow-y: auto;
   padding-top: 0;
 
   .search-group {
-    padding-top: .5rem;
+    padding-top: 0.5rem;
     position: sticky;
     top: 0;
-    background-color: $white;
+  }
+}
+
+// FIXME bvn fix (should be fixed in lib)
+:deep(.btn-group) {
+  display: block;
+  .btn {
+    width: 100%;
   }
 }
 </style>

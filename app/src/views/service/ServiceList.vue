@@ -1,87 +1,71 @@
-<template>
-  <view-search
-    id="service-list"
-    :search.sync="search"
-    :items="services"
-    :filtered-items="filteredServices"
-    items-name="services"
-    :queries="queries"
-    @queries-response="onQueriesResponse"
-  >
-    <b-list-group>
-      <b-list-group-item
-        v-for="{ name, description, status, last_state_change } in filteredServices" :key="name"
-        :to="{ name: 'service-info', params: { name }}"
-        class="d-flex justify-content-between align-items-center pr-0"
-      >
-        <div>
-          <h5 class="font-weight-bold">
-            {{ name }}
-            <small class="text-secondary">{{ description }}</small>
-          </h5>
-          <p class="m-0">
-            <span :class="status === 'running' ? 'text-success' : 'text-danger'">
-              <icon :iname="status === 'running' ? 'check-circle' : 'times'" />
-              {{ $t(status) }}
-            </span>
-            {{ $t('since') }} {{ last_state_change | distanceToNow }}
-          </p>
-        </div>
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 
-        <icon iname="chevron-right" class="lg fs-sm ml-auto" />
-      </b-list-group-item>
-    </b-list-group>
-  </view-search>
-</template>
-
-<script>
+import api from '@/api'
+import { useSearch } from '@/composables/useSearch'
 import { distanceToNow } from '@/helpers/filters/date'
+import type { ServiceList } from '@/types/core/api'
 
-export default {
-  name: 'ServiceList',
+const { t } = useI18n()
 
-  data () {
-    return {
-      queries: [
-        ['GET', 'services']
-      ],
-      search: '',
-      services: undefined
-    }
-  },
-
-  computed: {
-    filteredServices () {
-      if (!this.services) return
-      const search = this.search.toLowerCase()
-      const services = this.services.filter(({ name }) => {
-        return name.toLowerCase().includes(search)
-      })
-      return services.length ? services : null
-    }
-  },
-
-  methods: {
-    onQueriesResponse (services) {
-      this.services = Object.keys(services).sort().map(name => {
+const services = await api
+  .get<ServiceList>({ uri: 'services' })
+  .then((services) => {
+    return Object.keys(services)
+      .sort()
+      .map((name) => {
         const service = services[name]
-        if (service.last_state_change === 'unknown') {
-          service.last_state_change = 0
+        return {
+          ...service,
+          name,
+          last_state_change:
+            service.last_state_change === 'unknown'
+              ? t('unknown')
+              : distanceToNow(service.last_state_change, false),
         }
-        return { ...service, name }
       })
-    }
-  },
+  })
 
-  filters: { distanceToNow }
-}
+const [search, filteredServices] = useSearch(services, (s, service) => {
+  return service.name.toLowerCase().includes(s)
+})
 </script>
 
+<template>
+  <ViewSearch
+    id="service-list"
+    v-model="search"
+    :items="filteredServices"
+    items-name="services"
+  >
+    <BListGroup>
+      <YListItem
+        v-for="{
+          name,
+          description,
+          status,
+          last_state_change,
+        } in filteredServices"
+        :key="name"
+        :to="{ name: 'service-info', params: { name } }"
+        :label="name"
+        :sublabel="description"
+      >
+        <span :class="`text-${status === 'running' ? 'success' : 'danger'}`">
+          <YIcon :iname="status === 'running' ? 'check-circle' : 'times'" />
+          {{ $t(status) }}
+        </span>
+        {{ $t('since') }} {{ last_state_change }}
+      </YListItem>
+    </BListGroup>
+  </ViewSearch>
+</template>
+
 <style lang="scss" scoped>
-@include media-breakpoint-down(md) {
-   h5 small {
-     display: block;
-     margin-top: .25rem;
-   }
+@include media-breakpoint-down(lg) {
+  h5 small {
+    display: block;
+    margin-top: 0.25rem;
+  }
 }
 </style>

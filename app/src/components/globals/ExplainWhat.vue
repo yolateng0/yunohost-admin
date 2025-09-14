@@ -1,43 +1,50 @@
+<script setup lang="ts">
+import type { ColorVariant } from 'bootstrap-vue-next'
+import { ref } from 'vue'
+
+withDefaults(
+  defineProps<{
+    id: string
+    title: string
+    content: string
+    variant?: ColorVariant
+  }>(),
+  {
+    variant: 'info',
+  },
+)
+
+const open = ref(false)
+</script>
+
 <template>
   <span class="explain-what">
     <slot name="default" />
     <span class="explain-what-popover-container">
-      <b-button
-        :id="id" href="#"
+      <BButton
         variant="light"
+        @focus="open = true"
+        @blur="open = false"
+        @click="open = !open"
       >
-        <icon iname="question" />
-        <span class="sr-only">{{ $t('details_about', { subject: title }) }}</span>
-      </b-button>
-      <b-popover
-        placement="auto"
-        :target="id" triggers="focus" custom-class="explain-what-popover"
-        :variant="variant" :title="title"
+        <YIcon iname="question" />
+        <span class="visually-hidden">
+          {{ $t('details_about', { subject: title }) }}
+        </span>
+      </BButton>
+      <!-- FIXME missing prop `trigger` in bvn https://github.com/bootstrap-vue-next/bootstrap-vue-next/issues/1275 and looks like `placement` doesn't work -->
+      <BPopover
+        v-model="open"
+        placement="top"
+        custom-class="explain-what-popover"
+        :variant="variant"
+        :title="title"
       >
         <span v-html="content" />
-      </b-popover>
+      </BPopover>
     </span>
   </span>
 </template>
-
-<script>
-export default {
-  name: 'ExplainWhat',
-
-  props: {
-    id: { type: String, required: true },
-    title: { type: String, required: true },
-    content: { type: String, required: true },
-    variant: { type: String, default: 'info' }
-  },
-
-  computed: {
-    cols_ () {
-      return Object.assign({ md: 4, xl: 3 }, this.cols)
-    }
-  }
-}
-</script>
 
 <style lang="scss" scoped>
 .explain-what {
@@ -45,18 +52,30 @@ export default {
 
   .btn {
     padding: 0;
-    margin-left: .1rem;
+    margin-left: 0.25rem;
     border-radius: 50rem;
     line-height: inherit;
     font-size: inherit;
   }
 
-  &-popover {
-    background-color: $white;
-    border-width: 2px;
+  :deep() {
+    .popover {
+      background-color: $gray-800;
+      color: $black;
+      border-width: 2px;
 
-    ::v-deep .popover-body {
-      color: $dark;
+      [data-bs-theme='dark'] & {
+        background-color: $white;
+        color: $white;
+      }
+
+      .popover-body {
+        color: $white;
+
+        [data-bs-theme='dark'] & {
+          color: $black;
+        }
+      }
     }
   }
 }

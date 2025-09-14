@@ -1,85 +1,58 @@
-<template>
-  <view-search
-    :search.sync="search"
-    :items="users"
-    :filtered-items="filteredUsers"
-    items-name="users"
-    :queries="queries"
-  >
-    <template #top-bar-buttons>
-      <b-button variant="info" :to="{ name: 'group-list' }">
-        <icon iname="key-modern" /> {{ $t('groups_and_permissions_manage') }}
-      </b-button>
+<script setup lang="ts">
+import api from '@/api'
+import { useUsersAndGroups } from '@/composables/data'
+import { useInfos } from '@/composables/useInfos'
+import { useSearch } from '@/composables/useSearch'
 
-      <b-dropdown
+await api.get({
+  uri: 'users?fields=username&fields=fullname&fields=mail&fields=mailbox-quota&fields=groups',
+  cachePath: 'users',
+})
+
+const { users } = useUsersAndGroups()
+const [search, filteredUsers] = useSearch(
+  users,
+  (s, user) =>
+    user.username.toLowerCase().includes(s) || user.groups.includes(s),
+)
+
+function downloadExport() {
+  const { host } = useInfos()
+  window.open(`https://${host.value}/yunohost/api/users/export`, '_blank')
+}
+</script>
+
+<template>
+  <ViewSearch v-model="search" :items="filteredUsers" items-name="users">
+    <template #top-bar-buttons>
+      <BDropdown
         :split-to="{ name: 'user-create' }"
-        split variant="outline-success" right
+        split
+        variant="outline-success"
+        right
         split-variant="success"
       >
         <template #button-content>
-          <icon iname="plus" /> {{ $t('users_new') }}
+          <YIcon iname="plus" /> {{ $t('users_add') }}
         </template>
-        <b-dropdown-item :to="{ name: 'user-import' }">
-          <icon iname="plus" /> {{ $t('users_import') }}
-        </b-dropdown-item>
-        <b-dropdown-item @click="downloadExport">
-          <icon iname="download" /> {{ $t('users_export') }}
-        </b-dropdown-item>
-      </b-dropdown>
+        <BDropdownItem :to="{ name: 'user-import' }">
+          <YIcon iname="plus" /> {{ $t('users_import') }}
+        </BDropdownItem>
+        <BDropdownItem @click="downloadExport">
+          <YIcon iname="download" /> {{ $t('users_export') }}
+        </BDropdownItem>
+      </BDropdown>
     </template>
 
-    <b-list-group>
-      <b-list-group-item
-        v-for="user in filteredUsers" :key="user.username"
-        :to="{ name: 'user-info', params: { name: user.username }}"
-        class="d-flex justify-content-between align-items-center pr-0"
-      >
-        <div>
-          <h5 class="font-weight-bold">
-            {{ user.username }}
-            <small class="text-secondary">{{ user.fullname }}</small>
-          </h5>
-          <p class="m-0">
-            {{ user.mail }}
-          </p>
-        </div>
-        <icon iname="chevron-right" class="lg fs-sm ml-auto" />
-      </b-list-group-item>
-    </b-list-group>
-  </view-search>
+    <BListGroup>
+      <YListItem
+        v-for="user in filteredUsers"
+        :key="user.username"
+        :to="{ name: 'user-info', params: { name: user.username } }"
+        :label="user.username"
+        :sublabel="user.fullname"
+        :description="user.mail"
+      />
+    </BListGroup>
+  </ViewSearch>
 </template>
-
-<script>
-import { mapGetters } from 'vuex'
-
-export default {
-  name: 'UserList',
-
-  data () {
-    return {
-      queries: [
-        ['GET', { uri: 'users?fields=username&fields=fullname&fields=mail&fields=mailbox-quota&fields=groups', storeKey: 'users' }]
-      ],
-      search: ''
-    }
-  },
-  methods: {
-    downloadExport () {
-      const host = this.$store.getters.host
-      window.open(`https://${host}/yunohost/api/users/export`, '_blank')
-    }
-  },
-  computed: {
-    ...mapGetters(['users']),
-
-    filteredUsers () {
-      if (!this.users) return
-      const search = this.search.toLowerCase()
-      const filtered = this.users.filter(user => {
-        return user.username.toLowerCase().includes(search) || user.groups.includes(search)
-      })
-      return filtered.length === 0 ? null : filtered
-    }
-  }
-}
-</script>

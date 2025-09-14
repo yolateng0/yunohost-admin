@@ -1,36 +1,49 @@
-<template>
-  <b-form-tags
-    v-model="tags"
-    :id="id"
-    :placeholder="placeholder"
-    :required="required"
-    separator=" ,;"
-    :limit="limit"
-    remove-on-delete
-    :state="state"
-    v-on="$listeners"
-    @blur="$parent.$emit('touch', name)"
-  />
-</template>
+<script setup lang="ts">
+import { computed, inject } from 'vue'
 
-<script>
-export default {
-  name: 'TagsItem',
+import { ValidationTouchSymbol } from '@/composables/form'
+import type { BaseItemComputedProps, TagsItemProps } from '@/types/form'
 
-  data () {
-    return {
-      tags: this.value
-    }
+const props = withDefaults(
+  defineProps<TagsItemProps & BaseItemComputedProps>(),
+  {
+    id: undefined,
+    name: undefined,
+    placeholder: undefined,
+    touchKey: undefined,
+    disabled: false,
+    limit: undefined,
+    // options: undefined,
+
+    ariaDescribedby: undefined,
+    state: undefined,
+    validation: undefined,
   },
-  props: {
-    value: { type: Array, default: null },
-    id: { type: String, default: null },
-    placeholder: { type: String, default: null },
-    limit: { type: Number, default: null },
-    required: { type: Boolean, default: false },
-    state: { type: Boolean, default: null },
-    name: { type: String, default: null }
-  }
-}
+)
+
+const touch = inject(ValidationTouchSymbol)
+
+const modelValue = defineModel<string[]>()
+
+const required = computed(() => 'required' in (props?.validation ?? {}))
+
+// FIXME rework for options/choices
+// https://bootstrap-vue-next.github.io/bootstrap-vue-next/docs/components/form-tags.html#using-custom-form-components
 </script>
 
+<template>
+  <BFormTags
+    :id="id"
+    v-model="modelValue"
+    :name="name"
+    :placeholder="placeholder"
+    :limit="limit"
+    :aria-describedby="ariaDescribedby"
+    :state="state"
+    :required="required"
+    :disabled="disabled"
+    remove-on-delete
+    separator=" ,"
+    @blur="touch?.(touchKey)"
+  />
+</template>

@@ -1,71 +1,79 @@
-<template>
-  <b-list-group
-    v-bind="$attrs" flush
-    :class="{ 'fixed-height': fixedHeight, 'bordered': bordered }"
-    @scroll="onScroll"
-  >
-    <yuno-list-group-item
-      v-if="limit && messages.length > limit"
-      variant="info" v-t="'api.partial_logs'"
-    />
+<script setup lang="ts">
+import { watchThrottled } from '@vueuse/core'
+import type { BListGroup } from 'bootstrap-vue-next'
+import { nextTick, ref } from 'vue'
 
-    <yuno-list-group-item
-      v-for="({ color, text }, i) in reducedMessages" :key="i"
-      :variant="color" size="xs"
-    >
-      <span v-html="text" />
-    </yuno-list-group-item>
-  </b-list-group>
-</template>
+import type { RequestMessage } from '@/composables/useRequests'
 
-<script>
-export default {
-  name: 'MessageListGroup',
-
-  props: {
-    messages: { type: Array, required: true },
-    fixedHeight: { type: Boolean, default: false },
-    bordered: { type: Boolean, default: false },
-    autoScroll: { type: Boolean, default: false },
-    limit: { type: Number, default: null }
+const props = withDefaults(
+  defineProps<{
+    messages: RequestMessage[]
+    fixedHeight?: boolean
+    bordered?: boolean
+    autoScroll?: boolean
+    limit?: number
+  }>(),
+  {
+    fixedHeight: false,
+    bordered: false,
+    autoScroll: false,
+    limit: undefined,
   },
+)
 
-  data () {
-    return {
-      auto: true
+const rootElem = ref<InstanceType<typeof BListGroup> | null>(null)
+
+const auto = ref(props.autoScroll)
+const reducedMessages = ref<RequestMessage[]>([...props.messages])
+
+watchThrottled(
+  () => props.messages,
+  (messages) => {
+    const len = messages.length
+    if (!props.limit || len <= props.limit) {
+      reducedMessages.value = [...messages]
+    } else {
+      reducedMessages.value = messages.slice(len - props.limit)
     }
+    if (auto.value) nextTick(scrollToEnd)
   },
+  { throttle: 300, deep: true },
+)
 
-  computed: {
-    reducedMessages () {
-      const len = this.messages.length
-      if (!this.limit || len <= this.limit) {
-        return this.messages
-      }
-      return this.messages.slice(len - this.limit)
-    }
-  },
+function scrollToEnd() {
+  const elem = rootElem.value?.$el
+  elem?.scrollTo(0, elem.lastElementChild.offsetTop)
+}
 
-  methods: {
-    scrollToEnd () {
-      if (!this.auto) return
-      this.$nextTick(() => {
-        this.$el.scrollTo(0, this.$el.lastElementChild.offsetTop)
-      })
-    },
-
-    onScroll ({ target }) {
-      this.auto = target.scrollHeight === target.scrollTop + target.clientHeight
-    }
-  },
-
-  created () {
-    if (this.autoScroll) {
-      this.$watch('messages', this.scrollToEnd)
-    }
-  }
+function onScroll() {
+  if (!props.autoScroll) return
+  const elem = rootElem.value!.$el
+  const { scrollHeight, scrollTop, clientHeight } = elem
+  auto.value = scrollHeight === scrollTop + clientHeight
 }
 </script>
+<template>
+  <BListGroup
+    ref="rootElem"
+    flush
+    :class="{ 'fixed-height': fixedHeight, bordered: bordered }"
+    @scroll="onScroll"
+  >
+    <YListGroupItem
+      v-if="limit && messages.length > limit"
+      v-t="'api.partial_logs'"
+      variant="info"
+    />
+    <YListGroupItem
+      v-for="({ variant, text }, i) in reducedMessages"
+      :key="i"
+      :variant="variant"
+      size="xs"
+    >
+      <span v-html="text" />
+    </YListGroupItem>
+  </BListGroup>
+</template>
 
 <style lang="scss" scoped>
 .fixed-height {

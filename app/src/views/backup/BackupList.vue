@@ -1,74 +1,52 @@
-<template>
-  <view-base :queries="queries" @queries-response="onQueriesResponse" skeleton="list-group-skeleton">
-    <template #top>
-      <top-bar :button="{ text: $t('backup_new'), icon: 'plus', to: { name: 'backup-create' } }" />
-    </template>
-
-    <b-alert v-if="!archives" variant="warning">
-      <icon iname="exclamation-triangle" />
-      {{ $tc('items_verbose_count', 0, { items: $tc('items.backups', 0) }) }}
-    </b-alert>
-
-    <b-list-group v-else>
-      <b-list-group-item
-        v-for="{ name, created_at, path, size } in archives" :key="name"
-        :to="{ name: 'backup-info', params: { name, id }}"
-        :title="created_at | readableDate"
-        class="d-flex justify-content-between align-items-center pr-0"
-      >
-        <div>
-          <h5 class="font-weight-bold">
-            {{ created_at | distanceToNow }}
-            <small class="text-secondary">{{ name }} ({{ size | humanSize }})</small>
-          </h5>
-          <p class="mb-0">
-            {{ path }}
-          </p>
-        </div>
-        <icon iname="chevron-right" class="lg fs-sm ml-auto" />
-      </b-list-group-item>
-    </b-list-group>
-  </view-base>
-</template>
-
-<script>
+<script setup lang="ts">
+import api from '@/api'
+import { toEntries } from '@/helpers/commons'
 import { distanceToNow, readableDate } from '@/helpers/filters/date'
 import { humanSize } from '@/helpers/filters/human'
+import type { BackupList } from '@/types/core/api'
 
-export default {
-  name: 'BackupList',
+defineProps<{
+  id: string
+}>()
 
-  props: {
-    id: { type: String, required: true }
-  },
-
-  data () {
-    return {
-      queries: [
-        ['GET', 'backups?with_info']
-      ],
-      archives: undefined
-    }
-  },
-
-  methods: {
-    onQueriesResponse (data) {
-      const archives = Object.entries(data.archives)
-      if (archives.length) {
-        this.archives = archives.map(([name, infos]) => {
-          infos.name = name
-          return infos
-        }).reverse()
-      } else {
-        this.archives = null
-      }
-    }
-  },
-
-  filters: {
-    distanceToNow,
-    readableDate,
-    humanSize
-  }
-}
+const archives = await api
+  .get<BackupList>({ uri: 'backups?with_info', initial: true })
+  .then((data) => {
+    return toEntries(data.archives)
+      .map(([name, archive]) => ({ ...archive, name }))
+      .reverse()
+  })
 </script>
+
+<template>
+  <div>
+    <TopBar
+      :button="{
+        text: $t('backup_new'),
+        icon: 'plus',
+        to: { name: 'backup-create' },
+      }"
+    />
+
+    <YAlert
+      v-if="!archives.length"
+      alert
+      icon="exclamation-triangle"
+      variant="warning"
+    >
+      {{ $t('items_verbose_count', { items: $t('items.backups', 0) }, 0) }}
+    </YAlert>
+
+    <BListGroup v-else>
+      <YListItem
+        v-for="{ name, created_at, path, size } in archives"
+        :key="name"
+        :to="{ name: 'backup-info', params: { name, id } }"
+        :title="readableDate(created_at)"
+        :label="distanceToNow(created_at)"
+        :sublabel="`${name} (${humanSize(size)})`"
+        :description="path"
+      />
+    </BListGroup>
+  </div>
+</template>

@@ -1,70 +1,91 @@
-<template>
-  <div class="config-panel">
-    <routable-tabs
-      v-if="routes_.length > 1"
-      :routes="routes_"
-      v-bind="{ panels, forms, v: $v, ...$attrs }"
-      v-on="$listeners"
-    >
-      <template #tab-top>
-        <slot name="tab-top" />
-      </template>
-      <template #tab-before>
-        <slot name="tab-before" />
-      </template>
-      <template #tab-after>
-        <slot name="tab-after" />
-      </template>
-    </routable-tabs>
+<script
+  setup
+  lang="ts"
+  generic="NestedMV extends Obj, MV extends Obj<NestedMV>"
+>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
-    <card v-else :title="routes_[0].text" :icon="routes_[0].icon">
-      <slot name="tab-top" />
-      <slot name="tab-before" />
-      <slot name="tab-after" />
-    </card>
-  </div>
-</template>
+import type { FormValidation } from '@/composables/form'
+import type { KeyOfStr, Obj } from '@/types/commons'
+import type { ConfigPanel, ConfigPanels } from '@/types/configPanels'
 
-<script>
-import { validationMixin } from 'vuelidate'
+defineOptions({
+  inheritAttrs: false,
+})
 
-export default {
-  name: 'ConfigPanels',
+const currentRoute = useRoute()
+const _props = defineProps<{
+  panel: ConfigPanel<NestedMV, MV>
+  routes: ConfigPanels<NestedMV, MV>['routes']
+  validations: FormValidation<NestedMV>
+}>()
 
-  components: {
-    RoutableTabs: () => import('@/components/RoutableTabs.vue')
-  },
+const emit = defineEmits<{
+  apply: [action?: KeyOfStr<typeof _props.panel.fields>]
+}>()
 
-  mixins: [validationMixin],
+const slots = defineSlots<{
+  'tab-top'?: any
+  'tab-before'?: any
+  default?: any
+  'tab-after'?: any
+}>()
 
-  props: {
-    panels: { type: Array, default: undefined },
-    forms: { type: Object, default: undefined },
-    validations: { type: Object, default: undefined },
-    errors: { type: Object, default: undefined }, // never used
-    routes: { type: Array, default: null },
-    noRedirect: { type: Boolean, default: false }
-  },
+const modelValue = defineModel<NestedMV>({ required: true })
 
-  computed: {
-    routes_ () {
-      if (this.routes) return this.routes
-      return this.panels.map(panel => ({
-        to: { params: { tabId: panel.id } },
-        text: panel.name,
-        icon: panel.icon || 'wrench'
-      }))
-    }
-  },
-
-  validations () {
-    return { forms: this.validations }
-  },
-
-  created () {
-    if (!this.noRedirect && !this.$route.params.tabId) {
-      this.$router.replace({ params: { tabId: this.panels[0].id } })
-    }
-  }
-}
+const cardProps = computed(() => {
+  const { text, icon } = _props.routes[0]
+  return _props.routes.length === 1 ? { title: text, icon } : {}
+})
 </script>
+
+<template>
+  <CardForm
+    v-bind="cardProps"
+    :id="`panel-${panel.id}`"
+    :key="panel.id"
+    v-model="modelValue"
+    :fields="panel.fields"
+    :no-footer="!panel.hasApplyButton"
+    :sections="panel.sections"
+    :validations="validations"
+    class="config-panel"
+    @submit="emit('apply')"
+    @action="emit('apply', $event)"
+  >
+    <template v-if="routes.length > 1" #header>
+      <BCardHeader tag="nav">
+        <BNav card-header fill pills>
+          <BNavItem
+            v-for="route in routes"
+            :key="route.text"
+            :to="route.to"
+            :active="currentRoute.params.tabId === route.to.params?.tabId"
+          >
+            <!-- FIXME added :active="" because `exact-active-class` not working https://github.com/bootstrap-vue-next/bootstrap-vue-next/issues/1754 -->
+            <!-- exact-active-class="active" -->
+            <YIcon v-if="route.icon" :iname="route.icon" />
+            {{ route.text }}
+          </BNavItem>
+        </BNav>
+      </BCardHeader>
+    </template>
+
+    <template v-if="slots['tab-top']" #top>
+      <slot name="tab-top" />
+    </template>
+    <template v-if="panel.help" #disclaimer>
+      <div class="alert alert-info" v-html="panel.help" />
+    </template>
+    <template v-if="slots['tab-before']" #before-form>
+      <slot name="tab-before" />
+    </template>
+    <template v-if="slots.default" #default>
+      <slot name="default" />
+    </template>
+    <template v-if="slots['tab-after']" #after-form>
+      <slot name="tab-after" />
+    </template>
+  </CardForm>
+</template>

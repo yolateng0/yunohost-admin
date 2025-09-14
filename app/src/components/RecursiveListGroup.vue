@@ -1,64 +1,91 @@
-<template>
-  <b-list-group :flush="flush" :style="{ '--depth': tree.depth }">
-    <template v-for="(node, i) in tree.children">
-      <b-list-group-item
-        :key="node.id"
-        class="list-group-item-action" :class="getClasses(node, i)"
-        @click="$router.push(node.data.to)"
-      >
-        <slot name="default" v-bind="node" />
+<script setup lang="ts">
+import type {
+  AnyTreeNode,
+  TreeChildNode,
+  TreeRootNode,
+} from '@/helpers/data/tree'
 
-        <b-button
-          v-if="node.children"
-          size="xs" variant="outline-secondary"
-          :aria-expanded="node.data.opened ? 'true' : 'false'" :aria-controls="'collapse-' + node.id"
-          :class="node.data.opened ? 'not-collapsed' : 'collapsed'" class="ml-2"
-          @click.stop="node.data.opened = !node.data.opened"
-        >
-          <span class="sr-only">{{ toggleText }}</span>
-          <icon iname="chevron-right" />
-        </b-button>
-      </b-list-group-item>
-
-      <b-collapse
-        v-if="node.children" :key="'collapse-' + node.id"
-        v-model="node.data.opened" :id="'collapse-' + node.id"
-      >
-        <recursive-list-group
-          :tree="node"
-          :last="last !== undefined ? last : i === tree.children.length - 1" flush
-        >
-          <!-- PASS THE DEFAULT SLOT WITH SCOPE TO NEXT NESTED COMPONENT -->
-          <template slot="default" slot-scope="scope">
-            <slot name="default" v-bind="scope" />
-          </template>
-        </recursive-list-group>
-      </b-collapse>
-    </template>
-  </b-list-group>
-</template>
-
-<script>
-export default {
-  name: 'RecursiveListGroup',
-
-  props: {
-    tree: { type: Object, required: true },
-    flush: { type: Boolean, default: false },
-    last: { type: Boolean, default: undefined },
-    toggleText: { type: String, default: null }
+const props = withDefaults(
+  defineProps<{
+    tree: AnyTreeNode
+    flush?: boolean
+    last?: boolean
+    toggleText?: string
+  }>(),
+  {
+    flush: false,
+    last: undefined,
+    toggleText: undefined,
   },
+)
 
-  methods: {
-    getClasses (node, i) {
-      const children = node.height > 0
-      const opened = children && node.data.opened
-      const last = this.last !== false && (!children || !opened) && i === this.tree.children.length - 1
-      return { collapsible: children, uncollapsible: !children, opened, last }
-    }
-  }
+type NodeSlot = {
+  [K in keyof TreeChildNode as TreeChildNode[K] extends (
+    callback: (node: AnyTreeNode, index: number, root: TreeRootNode) => boolean,
+  ) => AnyTreeNode
+    ? never
+    : K]: TreeChildNode[K]
+}
+
+defineSlots<{
+  default: (props: NodeSlot) => any
+}>()
+
+function getClasses(node: AnyTreeNode, i: number) {
+  const children = node.height > 0
+  const opened = children && node.data?.opened
+  const last =
+    props.last !== false &&
+    (!children || !opened) &&
+    i === props.tree.children.length - 1
+  return { collapsible: children, uncollapsible: !children, opened, last }
 }
 </script>
+
+<template>
+  <BListGroup :flush="flush" :style="{ '--depth': tree.depth }">
+    <template v-for="(node, i) in tree.children" :key="node.id">
+      <BListGroupItem
+        class="list-group-item-action"
+        :class="getClasses(node, i)"
+        @click="$router.push(node.data.to)"
+      >
+        <slot name="default" v-bind="node as NodeSlot" />
+
+        <BButton
+          v-if="node.height > 0"
+          size="xs"
+          variant="outline-secondary"
+          :aria-expanded="node.data.opened ? 'true' : 'false'"
+          :aria-controls="'collapse-' + node.id"
+          :class="node.data.opened ? 'not-collapsed' : 'collapsed'"
+          class="ms-2"
+          @click.stop="node.data.opened = !node.data.opened"
+        >
+          <span class="visually-hidden">{{ toggleText }}</span>
+          <YIcon iname="chevron-right" />
+        </BButton>
+      </BListGroupItem>
+
+      <BCollapse
+        v-if="node.height > 0"
+        :id="'collapse-' + node.id"
+        v-model="node.data.opened"
+      >
+        <RecursiveListGroup
+          :tree="node"
+          :last="last !== undefined ? last : i === tree.children.length - 1"
+          flush
+        >
+          <!-- PASS THE DEFAULT SLOT WITH SCOPE TO NEXT NESTED COMPONENT -->
+          <template #default="scope">
+            <slot name="default" v-bind="scope" />
+          </template>
+        </RecursiveListGroup>
+      </BCollapse>
+    </template>
+  </BListGroup>
+</template>
 
 <style lang="scss" scoped>
 .list-group {
@@ -104,8 +131,13 @@ export default {
     text-decoration: none;
     background-color: $list-group-hover-bg;
 
-    @include hover-focus() {
-      background-color: darken($list-group-hover-bg, 3%);
+    &:hover,
+    &:focus {
+      background-color: shade-color($body-tertiary-bg, 3%);
+
+      [data-bs-theme='dark'] & {
+        background-color: tint-color($body-tertiary-bg-dark, 3%);
+      }
     }
   }
 }

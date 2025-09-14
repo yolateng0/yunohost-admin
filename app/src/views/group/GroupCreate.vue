@@ -1,61 +1,49 @@
-<template>
-  <card-form
-    :title="$t('group_new')" icon="users"
-    :validation="$v" :server-error="serverError"
-    @submit.prevent="onSubmit"
-  >
-    <!-- GROUP NAME -->
-    <form-field v-bind="groupname" v-model="form.groupname" :validation="$v.form.groupname" />
-  </card-form>
-</template>
-
-<script>
-import { validationMixin } from 'vuelidate'
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 import api from '@/api'
-import { required, alphalownum_ } from '@/helpers/validators'
+import { useForm } from '@/composables/form'
+import { alphalownumdot_, required } from '@/helpers/validators'
+import type { FieldProps, FormFieldDict } from '@/types/form'
 
-export default {
-  name: 'GroupCreate',
+const { t } = useI18n()
+const router = useRouter()
 
-  data () {
-    return {
-      form: {
-        groupname: ''
-      },
-      serverError: '',
-      groupname: {
-        label: this.$i18n.t('group_name'),
-        description: this.$i18n.t('group_format_name_help'),
-        props: {
-          id: 'groupname',
-          placeholder: this.$i18n.t('placeholder.groupname')
-        }
-      }
-    }
-  },
+const form = ref({ groupname: '' })
+const fields = {
+  groupname: {
+    component: 'InputItem',
+    label: t('group_name'),
+    description: t('group_format_name_help'),
+    rules: { required, alphalownumdot_ },
+    cProps: {
+      id: 'groupname',
+      placeholder: t('placeholder.groupname'),
+    },
+  } satisfies FieldProps<'InputItem', string>,
+} satisfies FormFieldDict<typeof form.value>
 
-  validations: {
-    form: {
-      groupname: { required, alphalownum_ }
-    }
-  },
+const { v, onSubmit } = useForm(form, fields)
 
-  methods: {
-    onSubmit () {
-      api.post(
-        { uri: 'users/groups', storeKey: 'groups' },
-        this.form,
-        { key: 'groups.create', name: this.form.groupname }
-      ).then(() => {
-        this.$router.push({ name: 'group-list' })
-      }).catch(err => {
-        if (err.name !== 'APIBadRequestError') throw err
-        this.serverError = err.message
-      })
-    }
-  },
-
-  mixins: [validationMixin]
-}
+const onAddGroup = onSubmit((onError) => {
+  api
+    .post({ uri: 'users/groups', cachePath: 'groups', data: form.value })
+    .then(() => {
+      router.push({ name: 'group-list' })
+    })
+    .catch(onError)
+})
 </script>
+
+<template>
+  <CardForm
+    v-model="form"
+    icon="users"
+    :fields="fields"
+    :title="$t('group_add')"
+    :validations="v"
+    @submit.prevent="onAddGroup"
+  />
+</template>

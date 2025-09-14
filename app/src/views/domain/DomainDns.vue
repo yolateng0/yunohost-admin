@@ -1,14 +1,149 @@
-<template>
-  <view-base
-    :queries="queries" @queries-response="onQueriesResponse" :loading="loading"
-    skeleton="card-info-skeleton"
-  >
-    <section v-if="showAutoConfigCard" class="panel-section">
-      <b-card-title title-tag="h3">
-        {{ $t('domain.dns.auto_config') }}
-      </b-card-title>
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
-      <read-only-alert-item
+import api from '@/api'
+import { useAutoModal } from '@/composables/useAutoModal'
+import type { Obj, StateVariant } from '@/types/commons'
+import type { DNSCategories, DNSRecord } from '@/types/core/api'
+
+type DNSChanges = {
+  action: 'create' | 'update' | 'delete'
+  icon: string
+  variant: string
+  records: DNSRecord[]
+}
+type DNSError = { icon: string; variant: StateVariant; message: string }
+
+const props = defineProps<{
+  name: string
+  autoDns: boolean
+}>()
+
+const { t } = useI18n()
+const modalConfirm = useAutoModal()
+
+const dnsConfig = await api.get<string>({
+  uri: `domains/${props.name}/dns/suggest`,
+  initial: true,
+})
+
+const showAutoConfigCard = ref(true)
+const showManualConfigCard = ref(false)
+const dnsChanges = ref<DNSChanges[] | null>(null)
+const dnsErrors = ref<DNSError[]>([])
+const dnsZone = ref<DNSRecord[] | null>(null)
+const force = ref<boolean | null>(null)
+
+getDnsChanges()
+// FIXME other Suspense? get types
+function getDnsChanges() {
+  return api
+    .post<DNSCategories>({
+      uri: `domains/${props.name}/dns/push?dry_run`,
+      showModal: true,
+      isAction: false,
+    })
+    .then((dnsCategories) => {
+      let canForce = false
+
+      function getLongest(arr: Obj[], key: string) {
+        return arr.reduce((acc, obj) => {
+          if (obj[key].length > acc) return obj[key].length
+          return acc
+        }, 0)
+      }
+
+      function addSpace(str: string, len: number, prepend: boolean = false) {
+        return (prepend ? str : '') + ' '.repeat(len - str.length + 1)
+      }
+
+      function formatRecords(records?: DNSRecord[]) {
+        if (!records || !records.length) return null
+        const longestName = getLongest(records, 'name')
+        const longestType = getLongest(records, 'type')
+        return records.map((record) => {
+          record.name = addSpace(record.name, longestName, true)
+          record.spaces = addSpace(record.type, longestType)
+          if (record.managed_by_yunohost) canForce = true
+          return record
+        })
+      }
+
+      const categories = [
+        { action: 'create' as const, icon: 'plus', variant: 'success' },
+        { action: 'update' as const, icon: 'exchange', variant: 'warning' },
+        { action: 'delete' as const, icon: 'minus', variant: 'danger' },
+      ]
+      const changes = categories
+        .map((category) => {
+          const records = formatRecords(dnsCategories[category.action])
+          if (!records) return null
+          return { ...category, records }
+        })
+        .filter((dnsChange) => dnsChange !== null) as DNSChanges[]
+
+      dnsZone.value = formatRecords(dnsCategories.unchanged)
+      dnsChanges.value = changes.length > 0 ? changes : null
+      force.value = changes.length && canForce ? false : null
+    })
+    .catch((err) => {
+      if (err.name !== 'APIBadRequestError') throw err
+      const key = err.data.error_key
+      if (key === 'domain_dns_push_managed_in_parent_domain') {
+        /* i18n: domain_dns_push_managed_in_parent_domain */
+        const message = t(key, err.data)
+        dnsErrors.value = [{ icon: 'info', variant: 'info', message }]
+      } else if (key === 'domain_dns_push_failed_to_authenticate') {
+        /* i18n: domain_dns_push_failed_to_authenticate */
+        const message = t(key, err.data)
+        dnsErrors.value = [{ icon: 'ban', variant: 'danger', message }]
+      } else if (
+        key === 'domain_registrar_is_not_configured' &&
+        props.autoDns
+      ) {
+        dnsErrors.value = [
+          { icon: 'ban', variant: 'danger', message: err.data.error },
+        ]
+      } else {
+        showManualConfigCard.value = key !== 'domain_dns_conf_special_use_tld'
+        showAutoConfigCard.value = false
+      }
+    })
+}
+
+async function pushDnsChanges() {
+  if (force.value) {
+    const confirmed = await modalConfirm(t('domain.dns.push_force_confirm'))
+    if (!confirmed) return
+  }
+
+  api
+    .post<Obj<string[]>>({
+      uri: `domains/${props.name}/dns/push${force.value ? '?force' : ''}`,
+    })
+    .then(async (responseData) => {
+      await getDnsChanges()
+      dnsErrors.value = Object.keys(responseData).reduce((acc, key) => {
+        const args =
+          key === 'warnings'
+            ? { icon: 'warning', variant: 'warning' as const }
+            : { icon: 'ban', variant: 'danger' as const }
+        responseData[key].forEach((message) => acc.push({ ...args, message }))
+        return acc
+      }, [] as DNSError[])
+    })
+}
+</script>
+
+<template>
+  <div>
+    <section v-if="showAutoConfigCard" class="panel-section">
+      <BCardTitle title-tag="h3">
+        {{ $t('domain.dns.auto_config') }}
+      </BCardTitle>
+
+      <ReadOnlyAlertItem
         :label="$t('domain.dns.info')"
         type="warning"
         icon="flask"
@@ -16,39 +151,67 @@
 
       <!-- AUTO CONFIG CHANGES -->
       <template v-if="dnsChanges">
-        <div class="mb-3" v-for="{ action, records, icon, variant} in dnsChanges" :key="icon">
+        <div
+          v-for="{ action, records, icon, variant } in dnsChanges"
+          :key="icon"
+          class="mb-3"
+        >
           <h4 class="mt-4 mb-2">
             {{ action }}
           </h4>
 
           <div class="log">
             <div
-              v-for="({ name: record, spaces, old_content, content, type, managed_by_yunohost }, i) in records" :key="i"
-              class="records px-2" :class="{ 'ignored': managed_by_yunohost === false && force !== true }"
-              :title="managed_by_yunohost === false && force !== true ? $t('domain.dns.auto_config_ignored') : null"
+              v-for="(
+                {
+                  name: record,
+                  spaces,
+                  old_content,
+                  content,
+                  type,
+                  managed_by_yunohost,
+                },
+                i
+              ) in records"
+              :key="i"
+              class="records px-2"
+              :class="{
+                ignored: managed_by_yunohost === false && force !== true,
+              }"
+              :title="
+                managed_by_yunohost === false && force !== true
+                  ? $t('domain.dns.auto_config_ignored')
+                  : undefined
+              "
             >
-              <icon :iname="icon" :class="'text-' + variant" />
+              <YIcon :iname="icon" :class="'text-' + variant" />
               {{ record }}
-              <span class="bg-dark text-light px-1 rounded">{{ type }}</span>{{ spaces }}
-              <span v-if="old_content"><span class="text-danger">{{ old_content }}</span> --> </span>
-              <span :class="{ 'text-success': old_content }">{{ content }}</span>
+              <span class="bg-dark text-light px-1 rounded">{{ type }}</span
+              >{{ spaces }}
+              <span v-if="old_content"
+                ><span class="text-danger">{{ old_content }}</span> -->
+              </span>
+              <span :class="{ 'text-success': old_content }">{{
+                content
+              }}</span>
             </div>
           </div>
         </div>
       </template>
 
       <!-- CONFIG OK ALERT -->
-      <read-only-alert-item
-        v-else-if="dnsChanges === null"
+      <ReadOnlyAlertItem
+        v-else-if="dnsChanges === null && !dnsErrors.length"
         :label="$t('domain.dns.auto_config_ok')"
         type="success"
         icon="thumbs-up"
       />
 
       <!-- CONFIG ERROR ALERT -->
-      <template v-if="dnsErrors && dnsErrors.length">
-        <read-only-alert-item
-          v-for="({ variant, icon, message }, i) in dnsErrors" :key="i"
+      <template v-if="dnsErrors.length">
+        <ReadOnlyAlertItem
+          v-for="({ variant, icon, message }, i) in dnsErrors"
+          :key="i"
           :label="message"
           :type="variant"
           :icon="icon"
@@ -56,7 +219,7 @@
       </template>
 
       <!-- CONFIG OVERWRITE DISCLAIMER -->
-      <read-only-alert-item
+      <ReadOnlyAlertItem
         v-if="force !== null"
         :label="$t('domain.dns.push_force_warning')"
         type="warning"
@@ -64,26 +227,34 @@
 
       <!-- CONFIG PUSH SUBMIT -->
       <template v-if="dnsChanges">
-        <b-form-checkbox v-if="force !== null" v-model="force">
+        <BFormCheckbox v-if="force !== null" v-model="force">
           {{ $t('domain.dns.push_force') }}
-        </b-form-checkbox>
+        </BFormCheckbox>
 
-        <b-button variant="success" @click="pushDnsChanges">
+        <BButton variant="success" @click="pushDnsChanges">
           {{ $t('domain.dns.push') }}
-        </b-button>
+        </BButton>
       </template>
     </section>
 
     <!-- CURRENT DNS ZONE -->
-    <section v-if="showAutoConfigCard && dnsZone && dnsZone.length" class="panel-section">
-      <b-card-title title-tag="h3">
+    <section
+      v-if="showAutoConfigCard && dnsZone && dnsZone.length"
+      class="panel-section"
+    >
+      <BCardTitle title-tag="h3">
         {{ $t('domain.dns.auto_config_zone') }}
-      </b-card-title>
+      </BCardTitle>
 
       <div class="log">
-        <div v-for="({ name: record, spaces, content, type }, i) in dnsZone" :key="'zone-' + i" class="records">
+        <div
+          v-for="({ name: record, spaces, content, type }, i) in dnsZone"
+          :key="'zone-' + i"
+          class="records"
+        >
           {{ record }}
-          <span class="bg-dark text-light px-1 rounded">{{ type }}</span>{{ spaces }}
+          <span class="bg-dark text-light px-1 rounded">{{ type }}</span
+          >{{ spaces }}
           <span>{{ content }}</span>
         </div>
       </div>
@@ -91,147 +262,19 @@
 
     <!-- MANUAL CONFIG CARD -->
     <section v-if="showManualConfigCard" class="panel-section">
-      <b-card-title title-tag="h3">
+      <BCardTitle title-tag="h3">
         {{ $t('domain.dns.manual_config') }}
-      </b-card-title>
+      </BCardTitle>
 
-      <read-only-alert-item
+      <ReadOnlyAlertItem
         :label="$t('domain_dns_conf_is_just_a_recommendation')"
         type="warning"
       />
 
       <pre class="log">{{ dnsConfig }}</pre>
     </section>
-  </view-base>
+  </div>
 </template>
-
-<script>
-import api from '@/api'
-import { isEmptyValue } from '@/helpers/commons'
-
-export default {
-  name: 'DomainDns',
-
-  props: {
-    name: { type: String, required: true }
-  },
-
-  data () {
-    return {
-      queries: [
-        ['GET', `domains/${this.name}/dns/suggest`]
-      ],
-      loading: true,
-      showAutoConfigCard: true,
-      showManualConfigCard: false,
-      dnsConfig: '',
-      dnsChanges: undefined,
-      dnsErrors: undefined,
-      dnsZone: undefined,
-      force: null
-    }
-  },
-
-  methods: {
-    onQueriesResponse (suggestedConfig) {
-      this.dnsConfig = suggestedConfig
-    },
-
-    getDnsChanges () {
-      this.loading = true
-
-      return api.post(
-        `domains/${this.name}/dns/push?dry_run`, {}, null, { wait: false, websocket: false }
-      ).then(dnsChanges => {
-        function getLongest (arr, key) {
-          return arr.reduce((acc, obj) => {
-            if (obj[key].length > acc) return obj[key].length
-            return acc
-          }, 0)
-        }
-
-        const changes = []
-        let canForce = false
-        const categories = [
-          { action: 'create', icon: 'plus', variant: 'success' },
-          { action: 'update', icon: 'exchange', variant: 'warning' },
-          { action: 'delete', icon: 'minus', variant: 'danger' }
-        ]
-        categories.forEach(category => {
-          const records = dnsChanges[category.action]
-          if (records && records.length > 0) {
-            const longestName = getLongest(records, 'name')
-            const longestType = getLongest(records, 'type')
-            records.forEach(record => {
-              record.name = record.name + ' '.repeat(longestName - record.name.length + 1)
-              record.spaces = ' '.repeat(longestType - record.type.length + 1)
-              if (record.managed_by_yunohost === false) canForce = true
-            })
-            changes.push({ ...category, records })
-          }
-        })
-
-        const unchanged = dnsChanges.unchanged
-        if (unchanged) {
-          const longestName = getLongest(unchanged, 'name')
-          const longestType = getLongest(unchanged, 'type')
-          unchanged.forEach(record => {
-            record.name = record.name + ' '.repeat(longestName - record.name.length + 1)
-            record.spaces = ' '.repeat(longestType - record.type.length + 1)
-          })
-          this.dnsZone = unchanged
-        }
-
-        this.dnsChanges = changes.length > 0 ? changes : null
-        this.force = canForce ? false : null
-        this.loading = false
-      }).catch(err => {
-        if (err.name !== 'APIBadRequestError') throw err
-        const key = err.data.error_key
-        if (key === 'domain_dns_push_managed_in_parent_domain') {
-          const message = this.$t(key, err.data)
-          this.dnsErrors = [{ icon: 'info', variant: 'info', message }]
-        } else if (key === 'domain_dns_push_failed_to_authenticate') {
-          const message = this.$t(key, err.data)
-          this.dnsErrors = [{ icon: 'ban', variant: 'danger', message }]
-        } else {
-          this.showManualConfigCard = true
-          this.showAutoConfigCard = false
-        }
-        this.loading = false
-      })
-    },
-
-    async pushDnsChanges () {
-      if (this.force) {
-        const confirmed = await this.$askConfirmation(this.$i18n.t('domain.dns.push_force_confirm'))
-        if (!confirmed) return
-      }
-
-      api.post(
-        `domains/${this.name}/dns/push${this.force ? '?force' : ''}`,
-        {},
-        { key: 'domains.push_dns_changes', name: this.name }
-      ).then(async responseData => {
-        await this.getDnsChanges()
-        if (!isEmptyValue(responseData)) {
-          this.dnsErrors = Object.keys(responseData).reduce((acc, key) => {
-            const args = key === 'warnings'
-              ? { icon: 'warning', variant: 'warning' }
-              : { icon: 'ban', variant: 'danger' }
-            responseData[key].forEach(message => acc.push({ ...args, message }))
-            return acc
-          }, [])
-        }
-      })
-    }
-  },
-
-  created () {
-    this.getDnsChanges()
-  }
-}
-</script>
 
 <style lang="scss" scoped>
 .records {

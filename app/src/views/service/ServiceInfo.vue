@@ -1,154 +1,175 @@
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+import api from '@/api'
+import { useAutoModal } from '@/composables/useAutoModal'
+import { distanceToNow } from '@/helpers/filters/date'
+import type { ServiceInfo, ServiceLogs } from '@/types/core/api'
+
+const props = defineProps<{ name: string }>()
+
+const { t } = useI18n()
+const modalConfirm = useAutoModal()
+
+const { infos, upOrDownTime, isCritical, logs } = await api
+  .fetchAll<
+    [ServiceInfo, ServiceLogs]
+  >([{ uri: 'services/' + props.name }, { uri: `services/${props.name}/log?number=50` }])
+  .then(([service, logs]) => {
+    const { last_state_change, ...infos } = service
+    const criticalServices = ['nginx', 'ssh', 'slapd', 'yunohost-api']
+
+    return {
+      infos,
+      upOrDownTime:
+        last_state_change === 'unknown'
+          ? t('unknown')
+          : distanceToNow(last_state_change, false),
+      isCritical: criticalServices.includes(props.name),
+      logs: Object.keys(logs)
+        .sort((prev, curr) => {
+          if (prev === 'journalctl') return -1
+          else if (curr === 'journalctl') return 1
+          else if (prev < curr) return -1
+          else return 1
+        })
+        .map((filename) => ({
+          content: logs[filename].join('\n'),
+          filename,
+        })),
+    }
+  })
+
+async function updateService(action: 'start' | 'stop' | 'restart') {
+  /*
+  i18n: confirm_service_start
+  i18n: confirm_service_stop
+  i18n: confirm_service_restart
+  */
+  const confirmed = await modalConfirm(
+    t(`confirm_service_${action}`, { name: props.name }),
+  )
+  if (!confirmed) return
+
+  api.put({ uri: `services/${props.name}/${action}` }).then(() => api.refetch())
+}
+
+function shareLogs() {
+  const logsContent = logs
+    .map(({ filename, content }) => {
+      return `LOGFILE: ${filename}\n${content}`
+    })
+    .join('\n\n')
+
+  fetch('https://paste.yunohost.org/documents', {
+    method: 'POST',
+    body: logsContent,
+  })
+    .then((response) => {
+      if (response.ok) return response.json()
+      else console.error('error', response)
+      // FIXME flash error
+    })
+    .then(({ key }) => {
+      window.open(`https://paste.yunohost.org/${key}`, '_blank')
+    })
+}
+</script>
+
 <template>
-  <view-base
-    :queries="queries" @queries-response="onQueriesResponse"
-    ref="view" skeleton="card-info-skeleton"
-  >
+  <div>
     <!-- INFO CARD -->
-    <card :title="name" icon="info-circle" button-unbreak="sm">
+    <YCard :title="name" icon="info-circle" button-unbreak="sm">
       <template #header-buttons>
         <template v-if="infos.status === 'running'">
           <!-- RESTART SERVICE -->
-          <b-button @click="updateService('restart')" variant="warning">
-            <icon iname="refresh" /> {{ $t('restart') }}
-          </b-button>
+          <BButton variant="warning" @click="updateService('restart')">
+            <YIcon iname="refresh" /> {{ $t('restart') }}
+          </BButton>
 
           <!-- STOP SERVICE -->
-          <b-button v-if="!isCritical" @click="updateService('stop')" variant="danger">
-            <icon iname="warning" /> {{ $t('stop') }}
-          </b-button>
+          <BButton
+            v-if="!isCritical"
+            variant="danger"
+            @click="updateService('stop')"
+          >
+            <YIcon iname="warning" /> {{ $t('stop') }}
+          </BButton>
         </template>
 
         <!-- START SERVICE -->
-        <b-button v-else @click="updateService('start')" variant="success">
-          <icon iname="play" /> {{ $t('start') }}
-        </b-button>
+        <BButton v-else variant="success" @click="updateService('start')">
+          <YIcon iname="play" /> {{ $t('start') }}
+        </BButton>
       </template>
 
-      <b-row
-        v-for="(value, key) in infos" :key="key"
-        no-gutters class="row-line"
+      <BRow
+        v-for="(value, key) in infos"
+        :key="key"
+        no-gutters
+        class="row-line"
       >
-        <b-col md="3" xl="2">
-          <strong>{{ $t(key === 'start_on_boot' ? 'service_' + key : key) }}</strong>
-        </b-col>
-        <b-col>
+        <BCol md="3" xl="2">
+          <strong>
+            <!--
+              i18n: service_start_on_boot
+              i18n: configuration
+              i18n: status
+              i18n: description
+              -->
+            {{ $t(key === 'start_on_boot' ? 'service_' + key : key) }}
+          </strong>
+        </BCol>
+        <BCol>
           <template v-if="key === 'status'">
             <span :class="value === 'running' ? 'text-success' : 'text-danger'">
-              <icon :iname="value === 'running' ? 'check-circle' : 'times'" />
+              <YIcon :iname="value === 'running' ? 'check-circle' : 'times'" />
+              <!--
+              i18n: running
+              i18n: stopped
+              i18n: failed
+              i18n: unknown
+              -->
               {{ $t(value) }}
             </span>
-            {{ $t('since') }} {{ uptime | distanceToNow }}
+            {{ $t('since') }} {{ upOrDownTime }}
           </template>
 
-          <span v-else-if="key === 'start_on_boot'" :class="value === 'enabled' ? 'text-success' : 'text-danger'">
+          <span
+            v-else-if="key === 'start_on_boot'"
+            :class="value === 'enabled' ? 'text-success' : 'text-danger'"
+          >
+            <!--
+              i18n: enabled
+              i18n: disabled
+              i18n: unknown
+              -->
             {{ $t(value) }}
           </span>
 
           <span v-else v-t="value" />
-        </b-col>
-      </b-row>
-    </card>
+        </BCol>
+      </BRow>
+    </YCard>
 
     <!-- LOGS CARD -->
-    <card :title="$t('logs')" icon="book" button-unbreak="sm">
+    <YCard :title="$t('logs')" icon="book" button-unbreak="sm">
       <template #header-buttons>
-        <b-button variant="success" @click="shareLogs">
-          <icon iname="cloud-upload" /> {{ $t('logs_share_with_yunopaste') }}
-        </b-button>
+        <BButton variant="success" @click="shareLogs">
+          <YIcon iname="cloud-upload" /> {{ $t('logs_share_with_yunopaste') }}
+        </BButton>
       </template>
 
-      <template v-for="({ filename, content }, i) in logs">
-        <h3 :key="i + '-filename'">
+      <template v-for="{ filename, content } in logs" :key="filename">
+        <h3>
           {{ filename }}
         </h3>
 
-        <pre :key="i + '-content'" class="log"><code>{{ content }}</code></pre>
+        <pre class="log"><code>{{ content }}</code></pre>
       </template>
-    </card>
-  </view-base>
+    </YCard>
+  </div>
 </template>
-
-<script>
-import api from '@/api'
-import { distanceToNow } from '@/helpers/filters/date'
-
-export default {
-  name: 'ServiceInfo',
-
-  props: {
-    name: { type: String, required: true }
-  },
-
-  data () {
-    return {
-      queries: [
-        ['GET', 'services/' + this.name],
-        ['GET', `services/${this.name}/log?number=50`]
-      ],
-      // Service data
-      infos: undefined,
-      uptime: undefined,
-      isCritical: undefined,
-      logs: undefined,
-      // Modal action
-      action: undefined
-    }
-  },
-
-  methods: {
-    onQueriesResponse (
-      // eslint-disable-next-line
-      { status, description, start_on_boot, last_state_change, configuration },
-      logs
-    ) {
-      this.isCritical = ['nginx', 'ssh', 'slapd', 'yunohost-api'].includes(this.name)
-      // eslint-disable-next-line
-      this.uptime = last_state_change === 'unknown' ? 0 : last_state_change
-      this.infos = { description, status, start_on_boot, configuration }
-
-      this.logs = Object.keys(logs).sort((prev, curr) => {
-        if (prev === 'journalctl') return -1
-        else if (curr === 'journalctl') return 1
-        else if (prev < curr) return -1
-        else return 1
-      }).map(filename => ({ content: logs[filename].join('\n'), filename }))
-    },
-
-    async updateService (action) {
-      const confirmed = await this.$askConfirmation(
-        this.$i18n.t('confirm_service_' + action, { name: this.name })
-      )
-      if (!confirmed) return
-
-      api.put(
-        `services/${this.name}/${action}`,
-        {},
-        { key: 'services.' + action, name: this.name }
-      ).then(this.$refs.view.fetchQueries)
-    },
-
-    shareLogs () {
-      const logs = this.logs.map(({ filename, content }) => {
-        return `LOGFILE: ${filename}\n${content}`
-      }).join('\n\n')
-
-      fetch('https://paste.yunohost.org/documents', {
-        method: 'POST',
-        body: logs
-      }).then(response => {
-        if (response.ok) return response.json()
-        // FIXME flash error
-        /* eslint-disable-next-line */
-        else console.log('error', response)
-      }).then(({ key }) => {
-        window.open('https://paste.yunohost.org/' + key, '_blank')
-      })
-    }
-  },
-
-  filters: { distanceToNow }
-}
-</script>
 
 <style lang="scss" scoped>
 h3 {
